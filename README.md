@@ -1,59 +1,94 @@
-# Mytasks
+# Angular Firebase Todo App
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.11.
+A modern, responsive todo application built with Angular and Firebase. Features user authentication, real-time data synchronization, and a clean UI.
 
-## Development server
+## Features
 
-To start a local development server, run:
+- **User Authentication**: Secure login and registration using Firebase Auth
+- **Real-time Data**: Firestore database for instant updates across devices
+- **Responsive Design**: Works on desktop and mobile devices
+- **Task Management**: Create, read, update and delete tasks
+- **Session Management**: Automatic session timeout for security
 
-```bash
-ng serve
-```
+## Prerequisites
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+- Node.js (v14 or higher)
+- Angular CLI
+- Firebase account
 
-## Code scaffolding
+## Setup
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+1. Clone the repository:
+   ```
+   git clone https://github.com/ashansenadheeralk/todo.git
+   cd todo
+   ```
 
-```bash
-ng generate component component-name
-```
+2. Install dependencies:
+   ```
+   npm install
+   ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+3. Configure Firebase:
+   
+   The app uses environment files for Firebase configuration. Create or modify the following files:
 
-```bash
-ng generate --help
-```
+   - `src/environments/environment.ts` (development)
+   - `src/environments/environment.prod.ts` (production)
 
-## Building
+   Each file should contain your Firebase project configuration:
 
-To build the project run:
+   ```typescript
+   export const environment = {
+     production: false, // or true for environment.prod.ts
+     firebase: {
+       apiKey: "YOUR_API_KEY",
+       authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+       projectId: "YOUR_PROJECT_ID",
+       storageBucket: "YOUR_PROJECT_ID.appspot.com",
+       messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+       appId: "YOUR_APP_ID",
+       measurementId: "YOUR_MEASUREMENT_ID"
+     }
+   };
+   ```
 
-```bash
-ng build
-```
+   **Note**: Keep your Firebase configuration private and never commit actual API keys to public repositories.
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+4. Run the development server:
+   ```
+   ng serve
+   ```
 
-## Running unit tests
+5. Open your browser to `http://localhost:4200/`
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+## Project Structure
 
-```bash
-ng test
-```
+- `src/app/components/` - UI components
+- `src/app/services/` - Service classes for business logic and API integration
+- `src/environments/` - Environment configuration files
+- `src/assets/` - Static assets like images and styles
 
-## Running end-to-end tests
+## Available Scripts
 
-For end-to-end (e2e) testing, run:
+- `ng serve` - Run the development server
+- `ng build` - Build the application
+- `ng build --configuration production` - Build for production
+- `ng test` - Run tests
 
-```bash
-ng e2e
-```
+## Technologies Used
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+- **Angular**: Frontend framework
+- **Firebase Authentication**: User management
+- **Firestore**: NoSQL database
+- **Firebase Analytics**: Usage analytics
 
-## Additional Resources
+## Security Notes
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+- Environment files containing credentials are excluded from Git via `.gitignore`
+- Session timeout implemented for security
+- Firebase security rules should be configured for your project
+
+## License
+
+MIT
