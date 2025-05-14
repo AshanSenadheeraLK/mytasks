@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "public": "/home/runner/work/mytasks/mytasks/dist/mytasks",
+    "public": "dist/mytasks",
     "ignore": [
       "firebase.json",
       "**/.*",

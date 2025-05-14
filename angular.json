@@ -13,7 +13,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "/home/runner/work/mytasks/mytasks/dist/mytasks",
+            "outputPath": "dist/mytasks",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [
