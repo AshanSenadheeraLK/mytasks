@@ -22,7 +22,7 @@ import { environment } from '../../environments/environment';
   providedIn: 'root'
 })
 export class AuthService {
-  private auth: Auth;
+  private auth: Auth | null = null;
   private userSubject = new BehaviorSubject<User | null>(null);
   user$ = this.userSubject.asObservable();
   private sessionTimeoutTimer: any = null;
@@ -40,33 +40,49 @@ export class AuthService {
     });
 
     if (this.isBrowser) {
-      // Get the auth instance from window in browser environment
-      this.auth = (window as any).auth || getAuth();
-      
-      // If auth is not initialized, initialize Firebase with environment config
-      if (!this.auth || !this.auth.app) {
-        const app = initializeApp(environment.firebase);
-        this.auth = getAuth(app);
+      try {
+        // Try to get the auth instance from window (initialized in main.ts)
+        if ((window as any).auth) {
+          this.auth = (window as any).auth;
+          console.log('Using Auth instance from window');
+        } else {
+          // If not available, initialize it directly
+          console.log('Initializing Auth directly in service');
+          const app = (window as any).firebaseApp || initializeApp(environment.firebase);
+          this.auth = getAuth(app);
+          (window as any).auth = this.auth;
+        }
+        
+        if (this.auth) {
+          // Set persistence to local storage
+          setPersistence(this.auth, browserLocalPersistence)
+            .then(() => {
+              this.initAuthStateListener();
+              this.checkExistingSession();
+            })
+            .catch((error) => {
+              console.error('Error setting persistence:', error);
+              this.authReadyResolver(true);
+            });
+        } else {
+          console.error('Failed to initialize Auth');
+          this.authReadyResolver(true);
+        }
+      } catch (error) {
+        console.error('Error initializing Auth service:', error);
+        this.auth = null;
+        this.authReadyResolver(true);
       }
-      
-      // Set persistence to local storage
-      setPersistence(this.auth, browserLocalPersistence)
-        .then(() => {
-          this.initAuthStateListener();
-          this.checkExistingSession();
-        })
-        .catch((error) => {
-          console.error('Error setting persistence:', error);
-        });
     } else {
-      // In SSR, stub Auth instance and resolve authReady immediately
-      this.auth = {} as Auth;
+      // In SSR, don't initialize Auth
+      this.auth = null;
       this.authReadyResolver(true);
-      this.authReadyResolver = undefined!;
     }
   }
 
   private initAuthStateListener(): void {
+    if (!this.auth) return;
+    
     onAuthStateChanged(this.auth, (user) => {
       if (this.authReadyResolver) {
         this.authReadyResolver(true);
@@ -79,10 +95,18 @@ export class AuthService {
         this.userSubject.next(null);
         this.clearSession();
       }
+    }, (error) => {
+      console.error('Auth state change error:', error);
+      if (this.authReadyResolver) {
+        this.authReadyResolver(true);
+        this.authReadyResolver = undefined!;
+      }
     });
   }
 
   private checkExistingSession(): void {
+    if (!this.auth) return;
+    
     const sessionData = this.getSessionData();
     if (sessionData && this.isSessionValid(sessionData)) {
       // Session is valid, ensure user is set
@@ -115,20 +139,33 @@ export class AuthService {
 
   private getSessionData(): { loginTime: number } | null {
     if (!this.isBrowser) return null;
-    const sessionData = localStorage.getItem('session');
-    return sessionData ? JSON.parse(sessionData) : null;
+    try {
+      const sessionData = localStorage.getItem('session');
+      return sessionData ? JSON.parse(sessionData) : null;
+    } catch (error) {
+      console.error('Error retrieving session data:', error);
+      return null;
+    }
   }
 
   private setSessionData(): void {
     if (!this.isBrowser) return;
-    localStorage.setItem('session', JSON.stringify({
-      loginTime: Date.now()
-    }));
+    try {
+      localStorage.setItem('session', JSON.stringify({
+        loginTime: Date.now()
+      }));
+    } catch (error) {
+      console.error('Error setting session data:', error);
+    }
   }
 
   private clearSession(): void {
     if (this.isBrowser) {
-      localStorage.removeItem('session');
+      try {
+        localStorage.removeItem('session');
+      } catch (error) {
+        console.error('Error clearing session data:', error);
+      }
     }
     if (this.sessionTimeoutTimer) {
       clearTimeout(this.sessionTimeoutTimer);
@@ -144,6 +181,10 @@ export class AuthService {
   }
 
   async register(email: string, password: string): Promise<void> {
+    if (!this.auth) {
+      throw new Error('Authentication service is not initialized');
+    }
+    
     try {
       const userCredential = await createUserWithEmailAndPassword(this.auth, email, password);
       this.setSessionData();
@@ -158,6 +199,11 @@ export class AuthService {
     if (!this.isBrowser) {
       throw new Error('Login operations are not available on the server.');
     }
+    
+    if (!this.auth) {
+      throw new Error('Authentication service is not initialized');
+    }
+    
     try {
       const userCredential = await signInWithEmailAndPassword(this.auth, email, password);
       this.setSessionData();
@@ -184,6 +230,12 @@ export class AuthService {
   }
 
   async logout(reason?: string): Promise<void> {
+    if (!this.auth) {
+      this.clearSession();
+      this.router.navigate(['/']);
+      return;
+    }
+    
     try {
       await signOut(this.auth);
       this.clearSession();
@@ -198,12 +250,14 @@ export class AuthService {
       }
     } catch (error: any) {
       console.error('Logout error:', error);
-      throw error;
+      // Still clear session and redirect on error
+      this.clearSession();
+      this.router.navigate(['/']);
     }
   }
 
   isAuthenticated(): boolean {
-    if (!this.isBrowser) return false;
+    if (!this.isBrowser || !this.auth) return false;
     const sessionData = this.getSessionData();
     return this.auth.currentUser !== null && 
            sessionData !== null && 
@@ -211,6 +265,9 @@ export class AuthService {
   }
 
   getCurrentUser(): User | null {
-    return this.isAuthenticated() ? this.auth.currentUser : null;
+    if (this.isAuthenticated() && this.auth && this.auth.currentUser) {
+      return this.auth.currentUser;
+    }
+    return null;
   }
 } 

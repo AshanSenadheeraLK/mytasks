@@ -13,29 +13,45 @@ import { environment } from './environments/environment';
 // Bootstrap JS should not be imported globally here for SSR compatibility
 // import 'bootstrap/dist/js/bootstrap.bundle.min.js'; 
 
-// Initialize Firebase conditionally
+// Initialize Firebase
 let firebaseApp: FirebaseApp;
 let db: any;
 let auth: any;
 
 // Function to initialize Firebase
 function initializeFirebase() {
-  if (!firebaseApp) {
+  if (typeof window !== 'undefined' && !firebaseApp) {
     console.log('Initializing Firebase...');
-    firebaseApp = initializeApp(environment.firebase);
-    db = getFirestore(firebaseApp);
-    auth = getAuth(firebaseApp);
+    try {
+      firebaseApp = initializeApp(environment.firebase);
+      db = getFirestore(firebaseApp);
+      auth = getAuth(firebaseApp);
+      
+      // Make Firebase instances available globally
+      (window as any).firebaseApp = firebaseApp;
+      (window as any).db = db;
+      (window as any).auth = auth;
+      
+      return { firebaseApp, db, auth };
+    } catch (error) {
+      console.error('Error initializing Firebase:', error);
+      return { firebaseApp: null, db: null, auth: null };
+    }
   }
   return { firebaseApp, db, auth };
 }
 
 // Function to initialize analytics
 async function initializeAnalytics() {
-  if (typeof window !== 'undefined') {
-    const supported = await isAnalyticsSupported();
-    if (supported) {
-      console.log('Firebase Analytics is supported. Initializing...');
-      return getAnalytics(firebaseApp);
+  if (typeof window !== 'undefined' && firebaseApp) {
+    try {
+      const supported = await isAnalyticsSupported();
+      if (supported) {
+        console.log('Firebase Analytics is supported. Initializing...');
+        return getAnalytics(firebaseApp);
+      }
+    } catch (error) {
+      console.error('Error initializing Firebase Analytics:', error);
     }
   }
   console.log('Firebase Analytics is NOT supported in this environment.');
@@ -44,17 +60,16 @@ async function initializeAnalytics() {
 
 // Bootstrap the application
 const bootstrap = async () => {
+  // Initialize Firebase only in browser environment
   if (typeof window !== 'undefined') {
-    // Initialize Firebase only in browser environment
-    const { firebaseApp: app, db: database, auth: authentication } = initializeFirebase();
-    // Export for use in other files
-    (window as any).firebaseApp = app;
-    (window as any).db = database;
-    (window as any).auth = authentication;
+    initializeFirebase();
   }
 
   return bootstrapApplication(AppComponent, browserConfig)
-    .then(() => initializeAnalytics())
+    .then(() => {
+      if (firebaseApp) return initializeAnalytics();
+      return null;
+    })
     .catch(err => console.error('Error bootstrapping app:', err));
 };
 
