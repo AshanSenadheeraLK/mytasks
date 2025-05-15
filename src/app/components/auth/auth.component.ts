@@ -4,7 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { AlertService } from '../../services/alert.service';
-import { Subscription } from 'rxjs';
+import { Subscription, interval } from 'rxjs';
+import { take } from 'rxjs/operators';
 
 @Component({
   selector: 'app-auth',
@@ -22,7 +23,8 @@ import { Subscription } from 'rxjs';
         </div>
       </div>
 
-      <div class="row justify-content-center">
+      <!-- Main Auth Form - Hide when modal is shown -->
+      <div class="row justify-content-center" *ngIf="!showModal">
         <div class="col-md-10 col-lg-8 col-xl-6">
           <!-- Alert Message -->
           <div 
@@ -157,7 +159,9 @@ import { Subscription } from 'rxjs';
 
             <!-- Form Info -->
             <div class="d-flex flex-column align-items-center mt-4">
-              
+              <button class="neo-btn btn btn-sm mt-3" (click)="openHowToUseModal()">
+                <i class="bi bi-question-circle me-2"></i>How to Use
+              </button>
             </div>
           </div>
 
@@ -168,7 +172,80 @@ import { Subscription } from 'rxjs';
           </div>
         </div>
       </div>
+      
+      <!-- Show only when modal is active -->
+      <div class="row justify-content-center" *ngIf="showModal">
+        <div class="col-md-10 text-center mt-4">
+          <p class="text-primary small">
+            &copy; 2025 MY TASKS Task Manager • Designed and Developed by <a href="http://ashansenadheera.lk" class="text-primary text-decoration-none hover:text-decoration-underline" target="_blank" title="Visit developer's website">Ashan Senadheera</a>
+          </p>
+        </div>
+      </div>
     </div>
+
+    <!-- How-to-Use Modal -->
+    <div class="modal fade" [class.show]="showModal" [style.display]="showModal ? 'block' : 'none'" tabindex="-1" role="dialog" aria-labelledby="howToUseModalLabel" [attr.aria-hidden]="!showModal">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content neo-card">
+          <div class="modal-header border-0">
+            <h3 class="modal-title text-primary" id="howToUseModalLabel">How to Use</h3>
+            <button 
+              type="button" 
+              class="btn-close btn-close-white" 
+              [disabled]="!canCloseModal"
+              (click)="closeModal()"
+              aria-label="Close"
+              [attr.title]="canCloseModal ? 'Close modal' : 'Please wait ' + remainingTime + ' seconds'">
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="row g-4">
+              <div class="col-md-6">
+                <div class="neo-card p-3">
+                  <img src="howto01.png" alt="Step 1: No Tasks" class="img-fluid rounded mb-2">
+                  <p class="text-center mb-0 text-primary">Step 1: Start with a clean task list</p>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="neo-card p-3">
+                  <img src="howto02.png" alt="Step 2: Add a Task" class="img-fluid rounded mb-2">
+                  <p class="text-center mb-0 text-primary">Step 2: Add a new task</p>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="neo-card p-3">
+                  <img src="howto1.png" alt="Step 3: Successfully added a Task" class="img-fluid rounded mb-2">
+                  <p class="text-center mb-0 text-primary">Step 3: View your added task</p>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="neo-card p-3">
+                  <img src="howto2.png" alt="Step 4: Edit Task" class="img-fluid rounded mb-2">
+                  <p class="text-center mb-0 text-primary">Step 4: Edit your tasks as needed</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer border-0">
+            <div class="countdown-timer w-100 text-center">
+              <p *ngIf="!canCloseModal" class="text-warning mb-0">
+                <i class="bi bi-hourglass-split me-2"></i>
+                You can close this guide in {{ remainingTime }} seconds...
+              </p>
+              <button 
+                type="button" 
+                class="neo-btn btn mt-2"
+                [disabled]="!canCloseModal"
+                (click)="closeModal()">
+                {{ canCloseModal ? 'Close' : 'Please wait...' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Modal Backdrop -->
+    <div class="modal-backdrop fade" [class.show]="showModal" *ngIf="showModal"></div>
   `,
   styles: [`
     :host {
@@ -210,6 +287,61 @@ import { Subscription } from 'rxjs';
       color: var(--neon-cyan);
       text-shadow: 0 0 5px var(--neon-blue);
     }
+
+    .how-to-guide {
+      margin-top: 3rem;
+    }
+    
+    .how-to-guide h3 {
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+    }
+    
+    .how-to-guide .neo-card {
+      height: 100%;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .how-to-guide .neo-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+    
+    .how-to-guide img {
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .how-to-guide p {
+      margin-top: 1rem;
+      font-weight: 500;
+    }
+    
+    /* Modal Styles */
+    .modal-content {
+      border: none;
+      background-color: var(--bg-card);
+    }
+    
+    .modal-header, .modal-footer {
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    .modal.show {
+      display: block;
+    }
+    
+    .modal-backdrop.show {
+      opacity: 0.7;
+    }
+    
+    .countdown-timer {
+      color: var(--text-primary);
+    }
+    
+    .text-warning {
+      color: #ffc107 !important;
+    }
   `]
 })
 export class AuthComponent implements OnInit, OnDestroy {
@@ -219,6 +351,12 @@ export class AuthComponent implements OnInit, OnDestroy {
   sessionMessage: string | null = null;
   loginErrorMessage: string | undefined;
   loading: boolean = false;
+  
+  // Modal properties
+  showModal: boolean = false;
+  canCloseModal: boolean = false;
+  remainingTime: number = 12;
+  private modalTimerSubscription?: Subscription;
   
   private alertSubscription: Subscription = new Subscription();
   private sessionMessageTimeoutId: any;
@@ -256,7 +394,41 @@ export class AuthComponent implements OnInit, OnDestroy {
     if (this.loginErrorTimeoutId) {
       clearTimeout(this.loginErrorTimeoutId);
     }
+    if (this.modalTimerSubscription) {
+      this.modalTimerSubscription.unsubscribe();
+    }
     this.alertSubscription.unsubscribe();
+  }
+
+  // Modal functions
+  openHowToUseModal() {
+    this.showModal = true;
+    document.body.classList.add('modal-open');
+    this.remainingTime = 12;
+    this.canCloseModal = false;
+    
+    // Start the countdown timer
+    this.modalTimerSubscription = interval(1000).pipe(
+      take(13) // 0 to 12 seconds
+    ).subscribe(count => {
+      this.remainingTime = 12 - count;
+      if (this.remainingTime <= 0) {
+        this.canCloseModal = true;
+        if (this.modalTimerSubscription) {
+          this.modalTimerSubscription.unsubscribe();
+        }
+      }
+    });
+  }
+
+  closeModal() {
+    if (this.canCloseModal) {
+      this.showModal = false;
+      document.body.classList.remove('modal-open');
+      if (this.modalTimerSubscription) {
+        this.modalTimerSubscription.unsubscribe();
+      }
+    }
   }
 
   // Helper to switch forms and clear errors
