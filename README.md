@@ -1,6 +1,6 @@
-# Angular Firebase Todo App
+# Angular Firebase mytasks App
 
-A modern, responsive todo application built with Angular and Firebase. Features user authentication, real-time data synchronization, and a clean UI.
+A modern, responsive mytasks application built with Angular and Firebase. Features user authentication, real-time data synchronization, and a clean UI.
 
 ## Features
 
@@ -20,8 +20,8 @@ A modern, responsive todo application built with Angular and Firebase. Features 
 
 1. Clone the repository:
    ```
-   git clone https://github.com/ashansenadheeralk/todo.git
-   cd todo
+   git clone https://github.com/ashansenadheeralk/mytasks.git
+   cd mytasks
    ```
 
 2. Install dependencies:
