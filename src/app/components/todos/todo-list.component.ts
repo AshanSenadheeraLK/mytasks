@@ -1,10 +1,11 @@
-import { Component, OnInit, PLATFORM_ID, Inject } from '@angular/core';
+import { Component, OnInit, PLATFORM_ID, Inject, OnDestroy } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { TodoService, Todo } from '../../services/todo.service';
 import { AuthService } from '../../services/auth.service';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Observable, Subscription } from 'rxjs';
+import { map, tap } from 'rxjs/operators';
 import { TodoEditModalComponent } from './todo-edit-modal.component';
 import { AlertService } from '../../services/alert.service';
 
@@ -13,7 +14,7 @@ const version = '1.0.0.0';
 @Component({
   selector: 'app-todo-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, TodoEditModalComponent],
+  imports: [CommonModule, FormsModule, TodoEditModalComponent, RouterLink],
   template: `
     <div class="neo-navbar fixed-top bg-black">
       <div class="container-fluid py-3">
@@ -30,15 +31,15 @@ const version = '1.0.0.0';
             <div class="d-flex justify-content-lg-end align-items-center mt-3 mt-lg-0">
               <div class="user-badge neo-card me-3 p-2 px-3 d-flex align-items-center">
                 <i class="bi bi-person-circle me-2" aria-hidden="true"></i>
-                <span>{{ (userEmail$ | async) || 'User' }}</span>
+                <span>{{ userName || 'User' }}</span>
               </div>
-              <button 
-                class="neo-btn" 
-                (click)="logout()"
-                aria-label="Sign out"
-                title="Sign out from your account">
-                <i class="bi bi-box-arrow-right me-2" aria-hidden="true"></i>Sign Out
-              </button>
+              <a 
+                class="neo-btn me-2 text-decoration-none px-2" 
+                routerLink="/profile"
+                aria-label="User Profile"
+                title="View and edit your profile">
+                <i class="bi bi-person-circle me-2" aria-hidden="true"></i>Profile
+              </a>
             </div>
           </div>
         </div>
@@ -332,9 +333,10 @@ const version = '1.0.0.0';
     }
   `]
 })
-export class TodoListComponent implements OnInit {
+export class TodoListComponent implements OnInit, OnDestroy {
   todos$!: Observable<Todo[]>;
-  userEmail$!: Observable<string | null>;
+  private subscriptions: Subscription[] = [];
+  userName: string | null = null;
   todos: Todo[] = [];
   filter: 'all' | 'active' | 'completed' = 'all';
   
@@ -354,17 +356,33 @@ export class TodoListComponent implements OnInit {
 
   ngOnInit() {
     if (this.isBrowser) {
+      // Set initial userName
+      const currentUser = this.authService.getCurrentUser();
+      this.userName = currentUser?.displayName || currentUser?.email || 'User';
+
       this.todos$ = this.todoService.todos$.pipe(
         map(todos => {
           this.todos = todos;
           return todos;
         })
       );
-      
-      this.userEmail$ = this.authService.user$.pipe(
-        map(user => user?.email || null)
-      );
+
+      // Subscribe to user changes to update display name
+      const userSub = this.authService.user$.subscribe(user => {
+        if (user) {
+          // Prioritize displayName over email
+          this.userName = user.displayName || user.email || 'User';
+          console.log('User display name updated:', this.userName);
+        } else {
+          this.userName = 'User';
+        }
+      });
+      this.subscriptions.push(userSub);
     }
+  }
+  
+  ngOnDestroy() {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
   getFilteredTodos(todos: Todo[]): Todo[] {
@@ -479,15 +497,5 @@ export class TodoListComponent implements OnInit {
   getCompletionRate(todos: Todo[]): number {
     if (!todos || todos.length === 0) return 0;
     return (this.getCompletedCount(todos) / todos.length) * 100;
-  }
-
-  async logout() {
-    try {
-      await this.authService.logout();
-      this.alertService.addAlert('You have been signed out successfully', 'info');
-    } catch (error) {
-      console.error('Error logging out:', error);
-      this.alertService.addAlert('Could not sign out. Please try again.', 'error');
-    }
   }
 } 
