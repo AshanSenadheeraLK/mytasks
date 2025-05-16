@@ -106,10 +106,18 @@ export class TodoService implements OnDestroy {
       const q = query(todosRef, where('userId', '==', userId));
       
       this.unsubscribe = onSnapshot(q, (querySnapshot: QuerySnapshot<DocumentData>) => {
-        const todos = querySnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        })) as Todo[];
+        const todos = querySnapshot.docs.map(doc => {
+          const data = doc.data();
+          return {
+            id: doc.id,
+            title: data['title'],
+            description: data['description'],
+            completed: data['completed'] || false,
+            userId: data['userId'],
+            createdAt: data['createdAt'],
+            dueDate: data['dueDate']
+          } as Todo;
+        });
         this.todosSubject.next(todos);
       }, (error) => {
         console.error('Error listening to todos:', error);
