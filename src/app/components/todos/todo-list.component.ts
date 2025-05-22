@@ -9,7 +9,7 @@ import { map, tap } from 'rxjs/operators';
 import { TodoEditModalComponent } from './todo-edit-modal.component';
 import { AlertService } from '../../services/alert.service';
 
-const version = '1.0.0.0';
+const version = '1.2.0';
 
 @Component({
   selector: 'app-todo-list',
