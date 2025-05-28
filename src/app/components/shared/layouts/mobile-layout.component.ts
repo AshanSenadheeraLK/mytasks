@@ -13,7 +13,7 @@ import { ThemeToggleComponent } from '../theme-toggle.component';
       <header class="mobile-header">
         <div class="flex items-center">
           <h1 class="text-xl font-bold">My Tasks</h1>
-          <span class="ml-2 px-2 py-0.5 text-xs bg-blue-100 dark:bg-blue-900/30 text-primary dark:text-blue-300 rounded-full">v1.3.</span>
+          <span class="ml-2 px-2 py-0.5 text-xs bg-blue-100 dark:bg-blue-900/30 text-primary dark:text-blue-300 rounded-full">v1.3.0</span>
         </div>
         <div class="flex items-center space-x-3">
           <app-theme-toggle></app-theme-toggle>
