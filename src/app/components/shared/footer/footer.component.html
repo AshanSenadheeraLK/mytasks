@@ -1,71 +1,71 @@
-<footer class="footer bg-dark text-light pt-5 pb-3 position-relative">
-    <!-- Desktop footer (default) -->
-    <div class="container d-none d-lg-block">
-      <div class="row">
-        <div class="col-md-4 mb-4 mb-md-0">
-          <h5 class="fw-bold text-yellow-300">{{ title }}</h5>
-          <p>{{ description }}<br>
-            <br/>
-            <small class="text-muted">© {{ currentYear }} <span><a [href]='socialLinks[1].url' target="_blank">Ashan Senadheera.</a></span> All rights reserved.</small>
-          </p>
-        </div>
-        <div class="col-md-4">
-          <h6 class="fw-bold">Connect</h6>
-          <div class="social-links">
-              <a [href]="socialLinks[0].url" target="_blank" class="text-light fs-5"><span [title]='socialLinks[0].name'>
-                <i [class]="socialLinks[0].icon"></i>
-              </span> </a>
-              <a [href]="socialLinks[1].url" target="_blank" class="text-light fs-5"><span [title]='socialLinks[1].name'>
-                <i [class]="socialLinks[1].icon"></i>
-              </span> </a>
-          </div>
-        </div>
-      </div>
-      <button
-        *ngIf="showBackToTop"
-        (click)="backToTop()"
-        class="btn btn-outline-light position-absolute bottom-0 right-2 me-3 mb-3">
-        <i class="bi bi-arrow-up"></i> Top
-      </button>
-    </div>
-
-    <!-- Tablet footer -->
-    <div class="container d-none d-md-block d-lg-none">
-      <div class="text-center">
+<footer class="footer bg-primary text-light pt-5 pb-3 position-relative">
+  <!-- Desktop footer -->
+  <div class="container" *ngIf="isDesktop()">
+    <div class="row">
+      <div class="col-md-4 mb-4 mb-md-0">
         <h5 class="fw-bold text-yellow-300">{{ title }}</h5>
-        <p class="mb-2">{{ description }}</p>
-        <div class="social-links mb-3 d-flex justify-content-center gap-3">
-          <a *ngFor="let link of socialLinks" [href]="link.url" target="_blank" class="social-icon">
-            <i [class]="link.icon"></i>
-          </a>
-        </div>
-        <small class="text-muted d-block">© {{ currentYear }} <a [href]='socialLinks[1].url' target="_blank">Ashan Senadheera.</a> All rights reserved.</small>
+        <p>{{ description }}<br>
+          <br/>
+          <small class="text-muted">© {{ currentYear }} <span><a [href]='socialLinks[1].url' target="_blank">Ashan Senadheera.</a></span> All rights reserved.</small>
+        </p>
       </div>
-      <button
-        *ngIf="showBackToTop"
-        (click)="backToTop()"
-        class="btn btn-outline-light btn-sm position-fixed bottom-0 end-0 m-3">
-        <i class="bi bi-arrow-up"></i>
-      </button>
+      <div class="col-md-4">
+        <h6 class="fw-bold">Connect</h6>
+        <div class="social-links">
+            <a [href]="socialLinks[0].url" target="_blank" class="text-light fs-5"><span [title]='socialLinks[0].name'>
+              <i [class]="socialLinks[0].icon"></i>
+            </span> </a>
+            <a [href]="socialLinks[1].url" target="_blank" class="text-light fs-5"><span [title]='socialLinks[1].name'>
+              <i [class]="socialLinks[1].icon"></i>
+            </span> </a>
+        </div>
+      </div>
     </div>
+    <button
+      *ngIf="showBackToTop"
+      (click)="backToTop()"
+      class="btn btn-outline-light position-absolute bottom-0 right-2 me-3 mb-3">
+      <i class="bi bi-arrow-up"></i> Top
+    </button>
+  </div>
 
-    <!-- Mobile footer -->
-    <div class="container d-block d-md-none">
-      <div class="text-center">
-        <h6 class="fw-bold text-yellow-300 mb-2">{{ title }}</h6>
-        <div class="social-links d-flex justify-content-center gap-3 mb-2">
-          <a *ngFor="let link of socialLinks" [href]="link.url" target="_blank" class="social-icon-sm">
-            <i [class]="link.icon"></i>
-          </a>
-        </div>
-        <small class="text-muted d-block fs-7">© {{ currentYear }} <a [href]='socialLinks[1].url' target="_blank">Ashan Senadheera</a></small>
+  <!-- Tablet footer -->
+  <div class="container tablet-footer" *ngIf="isTablet()">
+    <div class="text-center">
+      <h5 class="fw-bold text-yellow-300">{{ title }}</h5>
+      <p class="mb-2">{{ description }}</p>
+      <div class="social-links mb-3">
+        <a *ngFor="let link of socialLinks" [href]="link.url" target="_blank" class="social-icon">
+          <i [class]="link.icon"></i>
+        </a>
       </div>
-      <button
-        *ngIf="showBackToTop"
-        (click)="backToTop()"
-        class="btn btn-sm btn-outline-light position-fixed bottom-0 end-0 m-2">
-        <i class="bi bi-arrow-up"></i>
-      </button>
+      <small class="text-muted d-block">© {{ currentYear }} <a [href]='socialLinks[1].url' target="_blank">Ashan Senadheera.</a> All rights reserved.</small>
     </div>
-  </footer>
+    <button
+      *ngIf="showBackToTop"
+      (click)="backToTop()"
+      class="btn btn-outline-light btn-sm position-fixed bottom-0 end-0 m-3">
+      <i class="bi bi-arrow-up"></i>
+    </button>
+  </div>
+
+  <!-- Mobile footer -->
+  <div class="container mobile-footer" *ngIf="isMobile()">
+    <div class="text-center">
+      <h6 class="fw-bold text-yellow-300 mb-2">{{ title }}</h6>
+      <div class="social-links">
+        <a *ngFor="let link of socialLinks" [href]="link.url" target="_blank" class="social-icon-sm">
+          <i [class]="link.icon"></i>
+        </a>
+      </div>
+      <small class="text-muted d-block small-text">© {{ currentYear }} <a [href]='socialLinks[1].url' target="_blank">Ashan Senadheera</a></small>
+    </div>
+    <button
+      *ngIf="showBackToTop"
+      (click)="backToTop()"
+      class="btn btn-sm btn-outline-light position-fixed bottom-0 end-0 m-2">
+      <i class="bi bi-arrow-up"></i>
+    </button>
+  </div>
+</footer>
   

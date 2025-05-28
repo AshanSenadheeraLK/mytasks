@@ -63,6 +63,53 @@
   font-display: swap;
 }
 
+/* Hero Section Styles */
+.mobile-hero, .tablet-hero {
+  background: linear-gradient(135deg, #2563eb, #3b82f6, #60a5fa);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-blob {
+  background: radial-gradient(circle at 70% 20%, rgba(96, 165, 250, 0.7), rgba(37, 99, 235, 0.2) 60%);
+  animation: blob-float 20s ease-in-out infinite alternate;
+}
+
+.mobile-hero .hero-icon {
+  animation: pulse 3s ease-in-out infinite;
+}
+
+.tablet-hero .hero-badge {
+  animation: shine 3s ease-in-out infinite;
+}
+
+@keyframes blob-float {
+  0% {
+    transform: translate(0, 0) scale(1);
+    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+  }
+  50% {
+    transform: translate(3%, 2%) scale(1.1);
+    border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%;
+  }
+  100% {
+    transform: translate(-3%, -2%) scale(0.9);
+    border-radius: 50% 60% 30% 70% / 40% 30% 70% 60%;
+  }
+}
+
+@keyframes shine {
+  0% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.7;
+  }
+}
+
 /* Custom base styles */
 @layer base {
   html {
