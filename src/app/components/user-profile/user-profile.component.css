@@ -43,6 +43,10 @@
   outline: none;
 }
 
+.neo-input:disabled {
+  cursor: not-allowed;
+}
+
 .neo-btn-delete {
   background: transparent;
   border: 1px solid var(--text-danger, #ff4040);
