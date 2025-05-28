@@ -1,12 +1,12 @@
 import { Component, OnInit, OnDestroy, Inject, PLATFORM_ID } from '@angular/core';
-import { RouterOutlet, Router } from '@angular/router';
+import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { AuthService } from './services/auth.service';
 import { AlertComponent } from './components/shared/alert/alert.component';
 import { Subscription } from 'rxjs';
 import { MobileLayoutComponent, DesktopLayoutComponent } from './components/shared/layouts';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { fromEvent } from 'rxjs';
-import { debounceTime, takeUntil } from 'rxjs/operators';
+import { debounceTime, takeUntil, filter } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 import { DeviceService } from './services/device.service';
 
@@ -29,10 +29,14 @@ import { DeviceService } from './services/device.service';
       </app-desktop-layout>
     </ng-container>
     
-    <ng-container *ngIf="currentDevice !== 'desktop'">
+    <ng-container *ngIf="currentDevice !== 'desktop' && !isLandingPage">
       <app-mobile-layout>
         <router-outlet></router-outlet>
       </app-mobile-layout>
+    </ng-container>
+    
+    <ng-container *ngIf="currentDevice !== 'desktop' && isLandingPage">
+      <router-outlet></router-outlet>
     </ng-container>
   `,
   styles: [`
@@ -45,7 +49,9 @@ import { DeviceService } from './services/device.service';
 })
 export class AppComponent implements OnInit, OnDestroy {
   currentDevice: string = 'desktop';
+  isLandingPage: boolean = false;
   private deviceSubscription: Subscription | null = null;
+  private routeSubscription: Subscription | null = null;
   private isBrowser: boolean;
   private subscription = new Subscription();
   private destroy$ = new Subject<void>();
@@ -53,7 +59,8 @@ export class AppComponent implements OnInit, OnDestroy {
   constructor(
     private authService: AuthService,
     @Inject(PLATFORM_ID) private platformId: Object,
-    private deviceService: DeviceService
+    private deviceService: DeviceService,
+    private router: Router
   ) {
     this.isBrowser = isPlatformBrowser(this.platformId);
   }
@@ -61,6 +68,7 @@ export class AppComponent implements OnInit, OnDestroy {
   ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {
       this.setupDeviceDetection();
+      this.setupRouteTracking();
       console.log('App initialized, waiting for auth ready...');
       
       // Subscribe to device type changes
@@ -106,9 +114,26 @@ export class AppComponent implements OnInit, OnDestroy {
     );
   }
 
+  private setupRouteTracking(): void {
+    // Track route changes to detect when on landing page
+    this.routeSubscription = this.router.events
+      .pipe(
+        filter(event => event instanceof NavigationEnd),
+        takeUntil(this.destroy$)
+      )
+      .subscribe((event: any) => {
+        // Landing page is at route '/'
+        this.isLandingPage = event.url === '/' || event.url === '';
+        console.log(`Is landing page: ${this.isLandingPage}`);
+      });
+  }
+
   ngOnDestroy(): void {
     if (this.deviceSubscription) {
       this.deviceSubscription.unsubscribe();
+    }
+    if (this.routeSubscription) {
+      this.routeSubscription.unsubscribe();
     }
     // Clean up subscriptions
     this.subscription.unsubscribe();
