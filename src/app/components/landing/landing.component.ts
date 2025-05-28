@@ -18,8 +18,7 @@ import { FooterComponent } from '../shared/footer/footer.component';
 
     <!-- Mobile Template -->
     <ng-template #mobileTemplate>
-      <!-- Mobile-specific UI -->
-      <div class="bg-gradient-to-r from-primary to-blue-600 min-h-screen">
+      <div class="min-h-screen flex flex-col bg-gradient-to-b from-blue-50 to-blue-200 relative">
         <!-- Mobile Navbar -->
         <nav class="bg-white shadow-md fixed top-0 left-0 right-0 z-50">
           <div class="px-4 py-3">
@@ -32,143 +31,24 @@ import { FooterComponent } from '../shared/footer/footer.component';
             </div>
           </div>
         </nav>
-
-        <!-- Mobile Hero Content -->
-        <div class="px-4 py-12 text-center">
-          <h1 class="text-3xl font-extrabold text-white tracking-tight">
-            Manage your tasks with ease
-          </h1>
-          <p class="mt-3 text-sm text-blue-100">
-            Organize, track, and accomplish your daily tasks with our intuitive task manager. 
-            Never miss a deadline again!
-          </p>
-          <div class="mt-6 flex flex-col space-y-3">
-            <a routerLink="/register" class="w-full btn btn-accent bg-accent hover:bg-blue-600 text-white py-3">
-              Get Started
-            </a>
-            <a routerLink="/login" class="w-full btn text-blue-700 bg-blue-100 hover:bg-blue-200 py-3">
-              Login
-            </a>
+        <!-- Hero -->
+        <div class="mobile-hero2 flex-1 flex flex-col justify-center items-center px-4 pt-24 pb-10 text-center relative">
+          <div class="mobile-hero2-bg absolute -top-20 -left-20 w-80 h-80 rounded-full bg-blue-300/30 blur-2xl z-0"></div>
+          <div class="mobile-hero2-illustration relative z-10 mb-6">
+            <i class="bi bi-journal-check text-6xl text-blue-500 bg-white/80 rounded-full p-4 shadow-lg"></i>
           </div>
+          <h1 class="text-3xl font-extrabold text-blue-900 mb-2 z-10">Stay on Track, Effortlessly</h1>
+          <p class="text-base text-blue-700 mb-6 z-10">All your tasks, reminders, and goals in one simple, beautiful app.</p>
+          <a routerLink="/register" class="btn btn-primary w-full max-w-xs mx-auto z-10">Get Started Free</a>
         </div>
-
-        <!-- Mobile Features -->
-        <div class="bg-white py-12 px-4">
-          <div class="text-center">
-            <h2 class="text-base text-accent font-semibold tracking-wide uppercase">Features</h2>
-            <p class="mt-2 text-2xl font-bold text-gray-900">
-              Everything you need to stay organized
-            </p>
-          </div>
-
-          <div class="mt-8 space-y-6">
-            <!-- Feature 1 -->
-            <div class="bg-white rounded-lg shadow-md p-5">
-              <div class="flex items-center space-x-4">
-                <div class="flex-shrink-0">
-                  <span class="inline-flex items-center justify-center p-3 bg-accent rounded-md shadow-lg">
-                    <svg class="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
-                    </svg>
-                  </span>
-                </div>
-                <div>
-                  <h3 class="text-lg font-medium text-gray-900">Task Management</h3>
-                  <p class="mt-1 text-sm text-gray-500">
-                    Create, edit, and organize your tasks with ease.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <!-- Feature 2 -->
-            <div class="bg-white rounded-lg shadow-md p-5">
-              <div class="flex items-center space-x-4">
-                <div class="flex-shrink-0">
-                  <span class="inline-flex items-center justify-center p-3 bg-accent rounded-md shadow-lg">
-                    <svg class="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                  </span>
-                </div>
-                <div>
-                  <h3 class="text-lg font-medium text-gray-900">Time Tracking</h3>
-                  <p class="mt-1 text-sm text-gray-500">
-                    Never miss a deadline with our intuitive time tracking.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
+        <!-- Trust signals -->
+        <div class="flex justify-center gap-6 text-xs text-blue-800/80 pb-6 z-10">
+          <div><i class="bi bi-people-fill mr-1"></i> 12,000+ users</div>
+          <div><i class="bi bi-star-fill mr-1 text-yellow-400"></i> 4.9/5 rating</div>
         </div>
-
-        <!-- Mobile How to Use -->
-        <div class="bg-blue-50 py-12 px-4">
-          <div class="text-center">
-            <h2 class="text-base text-accent font-semibold tracking-wide uppercase">How to Use</h2>
-            <p class="mt-2 text-2xl font-bold text-gray-900">
-              Get started in three easy steps
-            </p>
-          </div>
-
-          <div class="mt-8 space-y-6">
-            <!-- Step 1 -->
-            <div class="bg-white rounded-lg shadow-md p-5">
-              <div class="flex items-center space-x-4">
-                <div class="flex-shrink-0">
-                  <span class="inline-flex items-center justify-center h-8 w-8 rounded-full bg-primary text-white text-lg font-bold">
-                    1
-                  </span>
-                </div>
-                <div>
-                  <h3 class="text-lg font-medium text-gray-900">Create an account</h3>
-                  <p class="mt-1 text-sm text-gray-500">
-                    Sign up with your email to create your personal account.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <!-- Step 2 -->
-            <div class="bg-white rounded-lg shadow-md p-5">
-              <div class="flex items-center space-x-4">
-                <div class="flex-shrink-0">
-                  <span class="inline-flex items-center justify-center h-8 w-8 rounded-full bg-primary text-white text-lg font-bold">
-                    2
-                  </span>
-                </div>
-                <div>
-                  <h3 class="text-lg font-medium text-gray-900">Add your tasks</h3>
-                  <p class="mt-1 text-sm text-gray-500">
-                    Create tasks and organize them by priority and deadline.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <!-- Step 3 -->
-            <div class="bg-white rounded-lg shadow-md p-5">
-              <div class="flex items-center space-x-4">
-                <div class="flex-shrink-0">
-                  <span class="inline-flex items-center justify-center h-8 w-8 rounded-full bg-primary text-white text-lg font-bold">
-                    3
-                  </span>
-                </div>
-                <div>
-                  <h3 class="text-lg font-medium text-gray-900">Track your progress</h3>
-                  <p class="mt-1 text-sm text-gray-500">
-                    Monitor completion status and celebrate your achievements.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
         <!-- Mobile Footer -->
-        <footer class="bg-gray-100 py-4">
-          <!-- Footer -->
-          <div class="mt-auto text-center w-1/2 mx-auto">
+        <footer class="h-full py-4">
+          <div class="mt-auto text-center w-full mx-auto">
             <app-footer></app-footer>
           </div>
         </footer>
@@ -177,8 +57,7 @@ import { FooterComponent } from '../shared/footer/footer.component';
 
     <!-- Tablet Template -->
     <ng-template #tabletTemplate>
-      <!-- Tablet-specific UI -->
-      <div class="bg-gradient-to-r from-primary to-blue-600 min-h-screen">
+      <div class="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 to-blue-200 relative">
         <!-- Tablet Navbar -->
         <nav class="bg-white shadow-md fixed top-0 left-0 right-0 z-50">
           <div class="px-6 py-4">
@@ -191,130 +70,37 @@ import { FooterComponent } from '../shared/footer/footer.component';
             </div>
           </div>
         </nav>
-
-        <!-- Tablet Hero Content -->
-        <div class="px-6 py-16">
-          <div class="grid grid-cols-2 gap-8 items-center">
-            <div>
-              <h1 class="text-4xl font-extrabold text-white tracking-tight">
-                Manage your tasks with ease
-              </h1>
-              <p class="mt-4 text-lg text-blue-100">
-                Organize, track, and accomplish your daily tasks with our intuitive task manager. 
-                Never miss a deadline again!
-              </p>
-              <div class="mt-8 flex space-x-4">
-                <a routerLink="/register" class="btn btn-accent bg-accent hover:bg-blue-600 text-white px-6 py-3">
-                  Get Started
-                </a>
-                <a routerLink="/login" class="btn text-blue-700 bg-blue-100 hover:bg-blue-200 px-6 py-3">
-                  Login
-                </a>
+        <!-- Hero -->
+        <div class="tablet-hero2 flex-1 flex flex-col justify-center items-center px-8 pt-32 pb-16 relative">
+          <div class="tablet-hero2-bg absolute -top-32 -left-32 w-[32rem] h-[32rem] rounded-full bg-blue-200/40 blur-3xl z-0"></div>
+          <div class="w-full max-w-4xl grid grid-cols-2 gap-8 items-center relative z-10">
+            <div class="flex flex-col items-start">
+              <h1 class="text-4xl font-extrabold text-blue-900 mb-3">Organize. Focus. Achieve.</h1>
+              <p class="text-lg text-blue-700 mb-6">Your daily companion for managing tasks, deadlines, and goals—beautifully and efficiently.</p>
+              <a routerLink="/register" class="btn btn-primary px-8 py-3 mb-4">Start Free</a>
+              <div class="flex gap-6 text-sm text-blue-800/80 mt-2">
+                <div><i class="bi bi-people-fill mr-1"></i> 12,000+ users</div>
+                <div><i class="bi bi-star-fill mr-1 text-yellow-400"></i> 4.9/5 rating</div>
+                <div><i class="bi bi-shield-lock mr-1"></i> Secure</div>
               </div>
             </div>
-            <div class="relative">
-              <img class="w-full rounded-lg shadow-xl" src="hero.png" alt="Task management illustration">
-            </div>
-          </div>
-        </div>
-
-        <!-- Tablet Features -->
-        <div class="bg-white py-16 px-6">
-          <div class="text-center mb-10">
-            <h2 class="text-base text-accent font-semibold tracking-wide uppercase">Features</h2>
-            <p class="mt-2 text-3xl font-bold text-gray-900">
-              Everything you need to stay organized
-            </p>
-          </div>
-
-          <div class="grid grid-cols-2 gap-8">
-            <!-- Feature 1 -->
-            <div class="bg-white rounded-lg shadow-md p-6">
-              <div>
-                <span class="inline-flex items-center justify-center p-3 bg-accent rounded-md shadow-lg">
-                  <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
-                  </svg>
-                </span>
-                <h3 class="mt-4 text-lg font-medium text-gray-900">Task Management</h3>
-                <p class="mt-2 text-base text-gray-500">
-                  Create, edit, and organize your tasks with ease. Set due dates and priorities to stay on track.
-                </p>
-              </div>
-            </div>
-
-            <!-- Feature 2 -->
-            <div class="bg-white rounded-lg shadow-md p-6">
-              <div>
-                <span class="inline-flex items-center justify-center p-3 bg-accent rounded-md shadow-lg">
-                  <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                  </svg>
-                </span>
-                <h3 class="mt-4 text-lg font-medium text-gray-900">Time Tracking</h3>
-                <p class="mt-2 text-base text-gray-500">
-                  Never miss a deadline with our intuitive time tracking. Monitor your progress and stay on schedule.
-                </p>
+            <div class="flex justify-center items-center">
+              <div class="tablet-hero2-card bg-white/80 rounded-2xl shadow-xl p-6 flex flex-col items-center">
+                <i class="bi bi-calendar2-check text-5xl text-blue-400 mb-4"></i>
+                <div class="font-bold text-blue-900 mb-2">Today's Focus</div>
+                <ul class="text-blue-800 text-sm space-y-1 mb-2">
+                  <li><i class="bi bi-check-circle-fill text-green-400 mr-1"></i> Finish project report</li>
+                  <li><i class="bi bi-check-circle-fill text-green-400 mr-1"></i> Call with team</li>
+                  <li><i class="bi bi-circle text-gray-400 mr-1"></i> Plan next week</li>
+                </ul>
+                <button class="btn btn-secondary w-full mt-2">+ Add Task</button>
               </div>
             </div>
           </div>
         </div>
-
-        <!-- Tablet How to Use -->
-        <div class="bg-blue-50 py-16 px-6">
-          <div class="text-center mb-10">
-            <h2 class="text-base text-accent font-semibold tracking-wide uppercase">How to Use</h2>
-            <p class="mt-2 text-3xl font-bold text-gray-900">
-              Get started in three easy steps
-            </p>
-          </div>
-
-          <div class="grid grid-cols-3 gap-8">
-            <!-- Step 1 -->
-            <div class="bg-white rounded-lg shadow-md p-6 text-center">
-              <div class="flex flex-col items-center">
-                <span class="inline-flex items-center justify-center h-12 w-12 rounded-full bg-primary text-white text-2xl font-bold">
-                  1
-                </span>
-                <h3 class="mt-4 text-lg font-medium text-gray-900">Create an account</h3>
-                <p class="mt-2 text-base text-gray-500">
-                  Sign up with your email to create your personal account.
-                </p>
-              </div>
-            </div>
-
-            <!-- Step 2 -->
-            <div class="bg-white rounded-lg shadow-md p-6 text-center">
-              <div class="flex flex-col items-center">
-                <span class="inline-flex items-center justify-center h-12 w-12 rounded-full bg-primary text-white text-2xl font-bold">
-                  2
-                </span>
-                <h3 class="mt-4 text-lg font-medium text-gray-900">Add your tasks</h3>
-                <p class="mt-2 text-base text-gray-500">
-                  Create tasks and organize them by priority and deadline.
-                </p>
-              </div>
-            </div>
-
-            <!-- Step 3 -->
-            <div class="bg-white rounded-lg shadow-md p-6 text-center">
-              <div class="flex flex-col items-center">
-                <span class="inline-flex items-center justify-center h-12 w-12 rounded-full bg-primary text-white text-2xl font-bold">
-                  3
-                </span>
-                <h3 class="mt-4 text-lg font-medium text-gray-900">Track your progress</h3>
-                <p class="mt-2 text-base text-gray-500">
-                  Monitor completion status and celebrate your achievements.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
         <!-- Tablet Footer -->
-        <footer class="bg-gray-100 py-6">
-          <!-- Footer -->
-          <div class="mt-auto text-center w-1/2 mx-auto">
+        <footer class="h-full py-6">
+          <div class="mt-auto text-center w-full mx-auto">
             <app-footer></app-footer>
           </div>
         </footer>
@@ -419,7 +205,7 @@ import { FooterComponent } from '../shared/footer/footer.component';
                         </svg>
                       </span>
                     </div>
-                    <h3 class="mt-8 text-lg font-medium text-gray-900 tracking-tight">Time Tracking</h3>
+                    <h3 class="mt-8 text-lg font-medium text-gray-900">Time Tracking</h3>
                     <p class="mt-5 text-base text-gray-500">
                       Never miss a deadline with our intuitive time tracking. Monitor your progress and stay on schedule.
                     </p>
@@ -521,7 +307,7 @@ import { FooterComponent } from '../shared/footer/footer.component';
       </div>
 
       <!-- Footer -->
-      <div class="mt-auto text-center">
+      <div class="mt-auto w-full text-center">
         <app-footer></app-footer>
       </div>
     </div>

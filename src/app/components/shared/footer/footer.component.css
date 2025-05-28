@@ -59,22 +59,30 @@
   background-color: rgba(255, 255, 255, 0.2);
 }
 
-/* Tablet Styles */
-@media (min-width: 768px) and (max-width: 991px) {
-  .footer {
-    padding-top: 3rem !important;
-    padding-bottom: 2rem !important;
-  }
+/* Tablet footer specific styles */
+.tablet-footer {
+  padding-top: 3rem !important;
+  padding-bottom: 2rem !important;
 }
 
-/* Mobile Styles */
-@media (max-width: 767px) {
-  .footer {
-    padding-top: 2rem !important;
-    padding-bottom: 1.5rem !important;
-  }
-  
-  .fs-7 {
-    font-size: 0.8rem;
-  }
+.tablet-footer .social-links {
+  margin-bottom: 1rem;
+}
+
+.tablet-footer h5 {
+  margin-bottom: 1rem;
+}
+
+/* Mobile footer specific styles */
+.mobile-footer {
+  padding-top: 2rem !important;
+  padding-bottom: 1.5rem !important;
+}
+
+.mobile-footer .social-links {
+  margin-bottom: 0.75rem;
+}
+
+.small-text {
+  font-size: 0.8rem;
 }
