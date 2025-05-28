@@ -9,7 +9,10 @@ import { Subscription } from 'rxjs';
   imports: [CommonModule],
   template: `
     <div class="alert-container">
-      <div *ngFor="let alert of alerts" class="alert neo-card p-3 mb-2 text-white" role="alert" aria-live="assertive">
+      <div *ngFor="let alert of alerts"
+           [ngClass]="['alert','neo-card','p-3','mb-2','text-white','alert-' + alert.type]"
+           role="alert"
+           aria-live="assertive">
         <div class="d-flex align-items-center">
           <i *ngIf="alert.type === 'error'" class="bi bi-exclamation-triangle-fill me-2 text-warning" aria-hidden="true"></i>
           <i *ngIf="alert.type === 'warning'" class="bi bi-exclamation-circle-fill me-2 text-warning" aria-hidden="true"></i>
@@ -39,6 +42,11 @@ import { Subscription } from 'rxjs';
       animation: fadeIn 0.3s ease-in-out;
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     }
+    
+    .alert-error { background-color: #EF4444 !important; }
+    .alert-warning { background-color: #F59E0B !important; }
+    .alert-info { background-color: #3B82F6 !important; }
+    .alert-success { background-color: #10B981 !important; }
     
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(-10px); }
