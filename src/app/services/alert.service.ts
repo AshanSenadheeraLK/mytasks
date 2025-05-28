@@ -6,6 +6,7 @@ export interface Alert {
   message: string;
   type: 'error' | 'warning' | 'info' | 'success';
   autoClose?: boolean;
+  highContrast?: boolean;
 }
 
 @Injectable({
@@ -13,7 +14,7 @@ export interface Alert {
 })
 export class AlertService {
   private alertSubject = new BehaviorSubject<Alert[]>([]);
-  private readonly DEFAULT_ALERT_DURATION = 5321; // 5.321 seconds in milliseconds
+  private readonly DEFAULT_ALERT_DURATION = 8000; // Increased to 8 seconds for better readability
 
   // Observable that components can subscribe to
   alerts$: Observable<Alert[]> = this.alertSubject.asObservable();
@@ -26,13 +27,14 @@ export class AlertService {
   }
 
   // Add a new alert
-  addAlert(message: string, type: 'error' | 'warning' | 'info' | 'success' = 'info', autoClose: boolean = true): string {
+  addAlert(message: string, type: 'error' | 'warning' | 'info' | 'success' = 'info', autoClose: boolean = true, highContrast: boolean = true): string {
     const id = this.generateId();
     const alert: Alert = {
       id,
       message,
       type,
-      autoClose
+      autoClose,
+      highContrast
     };
 
     this.alertSubject.next([...this.alertSubject.value, alert]);

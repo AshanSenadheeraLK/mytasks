@@ -9,6 +9,8 @@ import { bootstrapApplication } from '@angular/platform-browser';
 import { AppComponent } from './app/app.component';
 import { browserConfig } from './app/app.config.browser';
 import { environment } from './environments/environment';
+// Import compiler to support JIT compilation
+import '@angular/compiler';
 
 // Bootstrap JS should not be imported globally here for SSR compatibility
 // import 'bootstrap/dist/js/bootstrap.bundle.min.js'; 
@@ -73,5 +75,5 @@ const bootstrap = async () => {
     .catch(err => console.error('Error bootstrapping app:', err));
 };
 
-// Initialize the application
+// Bootstrap the standalone AppComponent
 bootstrap();

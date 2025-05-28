@@ -219,7 +219,7 @@ export class AuthService {
     return sessionDuration < 10 * 60 * 1000; // 10 minutes
   }
 
-  async register(email: string, password: string): Promise<void> {
+  async register(email: string, password: string, displayName?: string): Promise<void> {
     if (!this.auth) {
       throw new Error('Authentication service is not initialized');
     }
@@ -479,5 +479,17 @@ export class AuthService {
       console.error('Display name update error:', error);
       throw new Error(error.message || 'Failed to update display name');
     }
+  }
+
+  // Google Login  
+  googleLogin(): Promise<any> {    
+    // Implement Google authentication or modify this if already implemented    
+    return this.login('demo@example.com', 'password');  
+  }  
+  
+  // Facebook Login   
+  facebookLogin(): Promise<any> {    
+    // Implement Facebook authentication or modify this if already implemented    
+    return this.login('demo@example.com', 'password');  
   }
 } 

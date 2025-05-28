@@ -18,7 +18,8 @@ import {
   getFirestore
 } from 'firebase/firestore';
 import { AuthService } from './auth.service';
-import { BehaviorSubject, Observable, Subscription } from 'rxjs';
+import { BehaviorSubject, Observable, Subject, Subscription } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { isPlatformBrowser } from '@angular/common';
 import { initializeApp } from 'firebase/app';
 import { environment } from '../../environments/environment';
@@ -31,6 +32,7 @@ export interface Todo {
   userId: string;
   createdAt: Timestamp | Date;
   dueDate?: Timestamp | Date;
+  priority?: 'low' | 'medium' | 'high';
   isEditing?: boolean;
 }
 
@@ -43,6 +45,7 @@ export class TodoService implements OnDestroy {
   todos$ = this.todosSubject.asObservable();
   private unsubscribe?: Unsubscribe;
   private authSubscription?: Subscription;
+  private destroy$ = new Subject<void>();
 
   constructor(
     private authService: AuthService,
@@ -81,17 +84,23 @@ export class TodoService implements OnDestroy {
   initTodosListener(): void {
     if (!isPlatformBrowser(this.platformId) || !this.db) return;
 
-    this.authSubscription = this.authService.user$.subscribe(user => {
-      if (user) {
-        this.listenToTodos(user.uid);
-      } else {
-        this.todosSubject.next([]);
-        if (this.unsubscribe) {
-          this.unsubscribe();
-          this.unsubscribe = undefined;
+    this.authSubscription = this.authService.user$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(user => {
+        if (user) {
+          this.listenToTodos(user.uid);
+        } else {
+          this.todosSubject.next([]);
+          this.cleanupFirestoreListener();
         }
-      }
-    });
+      });
+  }
+
+  private cleanupFirestoreListener(): void {
+    if (this.unsubscribe) {
+      this.unsubscribe();
+      this.unsubscribe = undefined;
+    }
   }
 
   listenToTodos(userId: string): void {
@@ -115,7 +124,8 @@ export class TodoService implements OnDestroy {
             completed: data['completed'] || false,
             userId: data['userId'],
             createdAt: data['createdAt'],
-            dueDate: data['dueDate']
+            dueDate: data['dueDate'],
+            priority: data['priority'] || 'medium'
           } as Todo;
         });
         this.todosSubject.next(todos);
@@ -129,7 +139,7 @@ export class TodoService implements OnDestroy {
     }
   }
 
-  async addTodo(title: string, description?: string, dueDate?: Date): Promise<void> {
+  async addTodo(title: string, description?: string, dueDate?: Date, priority: 'low' | 'medium' | 'high' = 'medium'): Promise<void> {
     if (!isPlatformBrowser(this.platformId) || !this.db) return;
     
     const user = this.authService.getCurrentUser();
@@ -140,7 +150,8 @@ export class TodoService implements OnDestroy {
       description,
       completed: false,
       userId: user.uid,
-      createdAt: serverTimestamp()
+      createdAt: serverTimestamp(),
+      priority
     };
 
     if (dueDate) {
@@ -188,12 +199,14 @@ export class TodoService implements OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.unsubscribe) {
-      this.unsubscribe();
-    }
+    this.cleanupFirestoreListener();
     
     if (this.authSubscription) {
       this.authSubscription.unsubscribe();
+      this.authSubscription = undefined;
     }
+
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 } 

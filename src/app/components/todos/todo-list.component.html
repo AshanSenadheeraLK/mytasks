@@ -1,0 +1,86 @@
+<div class="flex flex-col h-full">
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-4">
+    <div class="flex items-center justify-between mb-6">
+      <h1 class="text-2xl font-semibold text-gray-800 dark:text-white">My Tasks</h1>
+      <div class="flex items-center space-x-2">
+        <button class="btn btn-primary flex items-center">
+          <i class="bi bi-plus-circle mr-2"></i>
+          Add Task
+        </button>
+        <button class="btn btn-secondary">
+          <i class="bi bi-funnel"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Search and Filters Row -->
+    <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between mb-6 gap-4">
+      <div class="relative flex-grow max-w-md">
+        <input type="text" placeholder="Search tasks..." class="search-input pl-10" />
+        <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+          <i class="bi bi-search text-gray-400"></i>
+        </span>
+      </div>
+      
+      <div class="flex items-center space-x-2 flex-wrap">
+        <button class="sort-btn sort-btn-active">
+          <i class="bi bi-calendar-date mr-1"></i> Date
+        </button>
+        <button class="sort-btn">
+          <i class="bi bi-exclamation-triangle mr-1"></i> Priority
+        </button>
+        <button class="sort-btn">
+          <i class="bi bi-check2-circle mr-1"></i> Status
+        </button>
+      </div>
+    </div>
+
+    <!-- Task List -->
+    <div class="space-y-3 max-h-[calc(100vh-220px)] overflow-y-auto pr-1 custom-scrollbar">
+      <!-- Task Item Template -->
+      <div class="task-item flex items-start justify-between group">
+        <div class="flex items-start space-x-3 flex-grow">
+          <input type="checkbox" class="checkbox-custom mt-1" />
+          <div>
+            <h3 class="task-title text-gray-800 dark:text-white">Complete UI/UX Improvements</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-300 mb-2">Enhance the user interface and fix design issues</p>
+            <div class="flex items-center space-x-3 text-xs">
+              <span class="status-badge status-badge-pending">In Progress</span>
+              <span class="text-gray-500 dark:text-gray-400"><i class="bi bi-calendar3 mr-1"></i> Today</span>
+              <span class="text-red-500 dark:text-red-400"><i class="bi bi-flag-fill mr-1"></i> High</span>
+            </div>
+          </div>
+        </div>
+        <div class="hidden group-hover:flex items-center space-x-1">
+          <button class="p-1 text-gray-500 hover:text-blue-500 dark:text-gray-400 dark:hover:text-blue-400">
+            <i class="bi bi-pencil-square"></i>
+          </button>
+          <button class="p-1 text-gray-500 hover:text-red-500 dark:text-gray-400 dark:hover:text-red-400">
+            <i class="bi bi-trash"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Additional task items would be rendered here -->
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div class="hidden text-center py-20">
+    <div class="text-6xl text-gray-300 dark:text-gray-600 mb-4">
+      <i class="bi bi-check2-all"></i>
+    </div>
+    <h3 class="text-xl font-medium text-gray-700 dark:text-gray-300 mb-2">No tasks yet</h3>
+    <p class="text-gray-500 dark:text-gray-400 mb-6">Create your first task to get started</p>
+    <button class="btn btn-primary">
+      <i class="bi bi-plus-circle mr-2"></i>
+      Add Your First Task
+    </button>
+  </div>
+
+  <!-- Floating Action Button for Mobile -->
+  <button class="fab lg:hidden">
+    <i class="bi bi-plus text-xl"></i>
+  </button>
+</div>
+ 

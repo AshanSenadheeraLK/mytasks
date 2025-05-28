@@ -1,0 +1,31 @@
+<footer class="footer bg-dark text-light pt-5 pb-3 position-relative">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4 mb-4 mb-md-0">
+          <h5 class="fw-bold text-yellow-300">{{ title }}</h5>
+          <p>{{ description }}<br>
+            <br/>
+            <small class="text-muted">© {{ currentYear }} <span><a [href]='socialLinks[1].url' target="_blank">Ashan Senadheera.</a></span> All rights reserved.</small>
+          </p>
+        </div>
+        <div class="col-md-4">
+          <h6 class="fw-bold">Connect</h6>
+          <div class="social-links">
+              <a [href]="socialLinks[0].url" target="_blank" class="text-light fs-5"><span [title]='socialLinks[0].name'>
+                <i [class]="socialLinks[0].icon"></i>
+              </span> </a>
+              <a [href]="socialLinks[1].url" target="_blank" class="text-light fs-5"><span [title]='socialLinks[1].name'>
+                <i [class]="socialLinks[1].icon"></i>
+              </span> </a>
+          </div>
+        </div>
+      </div>
+      <button
+        *ngIf="showBackToTop"
+        (click)="backToTop()"
+        class="btn btn-outline-light position-absolute bottom-0 right-2 me-3 mb-3">
+        <i class="bi bi-arrow-up"></i> Top
+      </button>
+    </div>
+  </footer>
+  

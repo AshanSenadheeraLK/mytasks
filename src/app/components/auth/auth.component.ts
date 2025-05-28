@@ -26,43 +26,6 @@ import { take } from 'rxjs/operators';
       <!-- Main Auth Form - Hide when modal is shown -->
       <div class="row justify-content-center" *ngIf="!showModal">
         <div class="col-md-10 col-lg-8 col-xl-6">
-          <!-- Alert Message -->
-          <div 
-            *ngIf="sessionMessage" 
-            class="alert neo-card p-3 mb-4 text-white" 
-            role="alert"
-            aria-live="assertive">
-            <div class="d-flex align-items-center">
-              <i class="bi bi-exclamation-triangle-fill me-2 text-warning" aria-hidden="true"></i>
-              {{ sessionMessage }}
-              <button 
-                type="button" 
-                class="btn-close btn-close-white ms-auto"
-                (click)="sessionMessage = null"
-                aria-label="Close alert"
-                title="Close this notification">
-              </button>
-            </div>
-          </div>
-          <!-- Login Email or Password Wrong Alert -->
-          <div 
-            *ngIf="loginErrorMessage !== undefined" 
-            class="alert neo-card p-3 mb-4 text-white" 
-            role="alert"
-            aria-live="assertive">
-            <div class="d-flex align-items-center">
-              <i class="bi bi-exclamation-triangle-fill me-2 text-warning" aria-hidden="true"></i>
-              {{ loginErrorMessage }}
-              <button 
-                type="button" 
-                class="btn-close btn-close-white ms-auto"
-                (click)="loginErrorMessage = undefined"
-                aria-label="Close alert"
-                title="Close this notification">
-              </button>
-            </div>
-          </div>
-
           <div class="neo-card p-4 p-md-5 pulse">
             <!-- Tabs -->
             <div class="text-center mb-4">

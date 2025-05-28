@@ -1,0 +1,21 @@
+.footer {
+  color: #ffffff !important;
+}
+
+.footer a {
+  color: #ffffff !important;
+  text-decoration: none !important;
+}
+
+.footer .social-links {
+  display: flex;
+  flex-direction: row;
+  gap: 1.5rem;
+  align-items: center;
+  justify-content: center;
+}
+
+.footer a:hover {
+  color: #ffffff !important;
+  text-decoration: underline;
+}
