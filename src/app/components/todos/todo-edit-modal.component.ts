@@ -159,6 +159,40 @@ import { Todo } from '../../services/todo.service';
               </div>
             </div>
 
+            <!-- Tags Field -->
+            <div class="space-y-2">
+              <label for="tags" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Tags (comma separated)
+              </label>
+              <div class="relative rounded-xl shadow-sm">
+                <input
+                  type="text"
+                  class="block w-full pl-4 pr-10 py-3 border-0 ring-1 ring-gray-300 dark:ring-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                  id="tags"
+                  name="tags"
+                  [(ngModel)]="tagsInput"
+                  placeholder="work, personal" />
+                <div class="absolute inset-y-0 right-0 flex items-center pr-3">
+                  <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7h2a2 2 0 012 2v8a2 2 0 002 2h8a2 2 0 002-2V9a2 2 0 012-2h2" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <!-- Recurring -->
+            <div class="space-y-2">
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Recurring
+              </label>
+              <select [(ngModel)]="editedTodo.recurring" name="recurring" id="recurring" class="block w-full pl-3 pr-10 py-3 border-0 ring-1 ring-gray-300 dark:ring-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                <option [ngValue]="null">None</option>
+                <option value="daily">Daily</option>
+                <option value="weekly">Weekly</option>
+                <option value="monthly">Monthly</option>
+              </select>
+            </div>
+
             <!-- Due Date and Time -->
             <div class="space-y-3">
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -245,6 +279,7 @@ export class TodoEditModalComponent implements OnInit {
   editedTodo: Partial<Todo> = {};
   private tempDate: string = '';
   private tempTime: string = '';
+  tagsInput = '';
   private isBrowser: boolean;
 
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {
@@ -259,6 +294,9 @@ export class TodoEditModalComponent implements OnInit {
 
     if (this.todo) {
       this.editedTodo = { ...this.todo };
+      if (this.todo.tags) {
+        this.tagsInput = this.todo.tags.join(', ');
+      }
     } else {
       this.editedTodo = {
         title: '',
@@ -315,6 +353,10 @@ export class TodoEditModalComponent implements OnInit {
   }
 
   onSave() {
+    this.editedTodo.tags = this.tagsInput
+      .split(',')
+      .map(t => t.trim())
+      .filter(t => t);
     this.save.emit(this.editedTodo);
   }
 

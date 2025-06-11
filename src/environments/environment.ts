@@ -8,5 +8,7 @@ export const environment = {
     messagingSenderId: "456710557347",
     appId: "1:456710557347:web:d2a069bcbe4a1fb9ab3916",
     measurementId: "G-MLK1HF1MTG"
-  }
-}; 
+  },
+  aiApiUrl: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent',
+  aiApiKey: 'AIzaSyDDs2eltkKFeVtm6MUwW4gaXjeXlEEsEQI'
+};
