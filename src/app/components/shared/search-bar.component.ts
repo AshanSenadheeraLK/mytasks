@@ -9,6 +9,7 @@ export interface SearchFilter {
   filterType: 'all' | 'title' | 'description' | 'priority' | 'overdue';
   priorityValue?: 'low' | 'medium' | 'high';
   taskStatus: 'all' | 'pending' | 'completed';
+  tag?: string;
 }
 
 @Component({
@@ -162,12 +163,18 @@ export interface SearchFilter {
         <!-- Overdue Filter -->
         <div class="space-y-2">
           <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400">Due Date</h3>
-          <button 
-            (click)="setFilterType('overdue')" 
+          <button
+            (click)="setFilterType('overdue')"
             [class]="filterType === 'overdue' ? 'px-2 py-1 text-xs font-medium rounded-md bg-purple-500 text-white' : 'px-2 py-1 text-xs font-medium rounded-md bg-purple-100 text-purple-800 hover:bg-purple-200'"
           >
             Overdue
           </button>
+        </div>
+
+        <!-- Tag Filter -->
+        <div class="space-y-2">
+          <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400">Tag</h3>
+          <input type="text" [(ngModel)]="tag" (ngModelChange)="emitCurrentFilter()" class="w-full p-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300" placeholder="work" />
         </div>
       </div>
     </div>
@@ -198,6 +205,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   filterType: 'all' | 'title' | 'description' | 'priority' | 'overdue' = 'all';
   priorityValue?: 'low' | 'medium' | 'high';
   taskStatus: 'all' | 'pending' | 'completed' = 'all';
+  tag: string = '';
   showFilters: boolean = false;
   
   private searchSubject = new Subject<SearchFilter>();
@@ -210,7 +218,8 @@ export class SearchBarComponent implements OnInit, OnDestroy {
         prev.term === curr.term && 
         prev.filterType === curr.filterType &&
         prev.priorityValue === curr.priorityValue &&
-        prev.taskStatus === curr.taskStatus
+        prev.taskStatus === curr.taskStatus &&
+        prev.tag === curr.tag
       )
     ).subscribe(filter => {
       this.search.emit(filter);
@@ -272,6 +281,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
     this.filterType = 'all';
     this.priorityValue = undefined;
     this.taskStatus = 'all';
+    this.tag = '';
     this.emitCurrentFilter();
   }
   
@@ -280,7 +290,8 @@ export class SearchBarComponent implements OnInit, OnDestroy {
       term: this.searchTerm,
       filterType: this.filterType,
       priorityValue: this.priorityValue,
-      taskStatus: this.taskStatus
+      taskStatus: this.taskStatus,
+      tag: this.tag
     });
   }
 
@@ -293,6 +304,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
     if (this.taskStatus !== 'all') count++;
     if (this.filterType !== 'all') count++;
     if (this.priorityValue) count++;
+    if (this.tag) count++;
     return count;
   }
 

@@ -13,10 +13,11 @@ import { SearchBarComponent, SearchFilter } from '../shared/search-bar.component
 import { ThemeToggleComponent } from '../shared/theme-toggle.component';
 import { ResponsiveLayoutComponent } from '../shared/responsive-layout.component';
 import { DeviceService } from '../../services/device.service';
+import { AnalyticsService } from '../../services/analytics.service';
 // Import compiler to ensure JIT compilation works
 import '@angular/compiler';
 
-const version = '1.3.0';
+const version = '2.0.0';
 
 @Component({
   selector: 'app-todo-list',
@@ -592,7 +593,8 @@ export class TodoListComponent implements OnInit, OnDestroy {
       private themeService: ThemeService,
       @Inject(PLATFORM_ID) private platformId: Object,
       private deviceService: DeviceService,
-      private router: Router
+      private router: Router,
+      private analytics: AnalyticsService
     ) {
       this.isBrowser = isPlatformBrowser(this.platformId);
     }
@@ -681,6 +683,10 @@ export class TodoListComponent implements OnInit, OnDestroy {
         });
       }
 
+      if (this.searchFilter.tag) {
+        filtered = filtered.filter(todo => todo.tags?.includes(this.searchFilter.tag!));
+      }
+
       return filtered;
     }
 
@@ -726,7 +732,9 @@ export class TodoListComponent implements OnInit, OnDestroy {
             todoData.title!,
             todoData.description,
             todoData.dueDate as Date,
-            todoData.priority as 'low' | 'medium' | 'high'
+            todoData.priority as 'low' | 'medium' | 'high',
+            todoData.tags || [],
+            todoData.recurring || null
           );
           this.alertService.addAlert('New task added successfully!', 'success', true, true);
         }
@@ -793,8 +801,7 @@ export class TodoListComponent implements OnInit, OnDestroy {
     }
 
     getCompletionRate(todos: Todo[]): number {
-      if (!todos || todos.length === 0) return 0;
-      return (this.getCompletedCount(todos) / todos.length) * 100;
+      return this.analytics.getCompletionRate(todos);
     }
 
     isOverdue(todo: Todo): boolean {

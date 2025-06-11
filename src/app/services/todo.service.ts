@@ -18,6 +18,8 @@ import {
   getFirestore
 } from 'firebase/firestore';
 import { AuthService } from './auth.service';
+import { AiAgentService } from './ai-agent.service';
+import { NotificationService } from './notification.service';
 import { BehaviorSubject, Observable, Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { isPlatformBrowser } from '@angular/common';
@@ -33,6 +35,10 @@ export interface Todo {
   createdAt: Timestamp | Date;
   dueDate?: Timestamp | Date;
   priority?: 'low' | 'medium' | 'high';
+  tags?: string[];
+  subtasks?: { title: string; completed: boolean }[];
+  recurring?: 'daily' | 'weekly' | 'monthly' | null;
+  sharedWith?: string[];
   isEditing?: boolean;
 }
 
@@ -49,7 +55,9 @@ export class TodoService implements OnDestroy {
 
   constructor(
     private authService: AuthService,
-    @Inject(PLATFORM_ID) private platformId: Object
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private aiAgent: AiAgentService,
+    private notification: NotificationService
   ) {
     if (isPlatformBrowser(this.platformId)) {
       try {
@@ -139,7 +147,14 @@ export class TodoService implements OnDestroy {
     }
   }
 
-  async addTodo(title: string, description?: string, dueDate?: Date, priority: 'low' | 'medium' | 'high' = 'medium'): Promise<void> {
+  async addTodo(
+    title: string,
+    description?: string,
+    dueDate?: Date,
+    priority: 'low' | 'medium' | 'high' = 'medium',
+    tags: string[] = [],
+    recurring: 'daily' | 'weekly' | 'monthly' | null = null
+  ): Promise<void> {
     if (!isPlatformBrowser(this.platformId) || !this.db) return;
     
     const user = this.authService.getCurrentUser();
@@ -151,7 +166,9 @@ export class TodoService implements OnDestroy {
       completed: false,
       userId: user.uid,
       createdAt: serverTimestamp(),
-      priority
+      priority,
+      tags,
+      recurring
     };
 
     if (dueDate) {
@@ -159,11 +176,23 @@ export class TodoService implements OnDestroy {
     }
 
     try {
-      await addDoc(collection(this.db, 'todos'), todoData);
+      const ref = await addDoc(collection(this.db, 'todos'), todoData);
+      if (dueDate) {
+        this.notification.schedule(new Date(dueDate), `Task due: ${title}`);
+      }
     } catch (error) {
       console.error('Error adding todo:', error);
       throw error;
     }
+  }
+
+  async createTodoWithAi(prompt: string): Promise<void> {
+    const result = await this.aiAgent.sendPrompt(prompt);
+    if (!result) return;
+
+    const { title, description, dueDate, tags = [], recurring = null } = result;
+    const parsedDate = dueDate ? new Date(dueDate) : undefined;
+    await this.addTodo(title, description, parsedDate, 'medium', tags, recurring);
   }
 
   async updateTodo(id: string, updates: Partial<Omit<Todo, 'id' | 'userId' | 'createdAt'>>): Promise<void> {
@@ -196,6 +225,20 @@ export class TodoService implements OnDestroy {
     if (!todo) throw new Error('Todo not found for toggle');
     
     await this.updateTodo(id, { completed: !todo.completed });
+  }
+
+  async shareTodoWithUser(id: string, userId: string): Promise<void> {
+    if (!isPlatformBrowser(this.platformId) || !this.db) return;
+
+    try {
+      const todoRef = doc(this.db, 'todos', id);
+      const existing = this.todosSubject.value.find(t => t.id === id)?.sharedWith || [];
+      const updated = Array.from(new Set([...existing, userId]));
+      await updateDoc(todoRef, { sharedWith: updated });
+    } catch (error) {
+      console.error('Error sharing todo:', error);
+      throw error;
+    }
   }
 
   ngOnDestroy(): void {

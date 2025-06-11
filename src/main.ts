@@ -9,6 +9,13 @@ import { bootstrapApplication } from '@angular/platform-browser';
 import { AppComponent } from './app/app.component';
 import { browserConfig } from './app/app.config.browser';
 import { environment } from './environments/environment';
+
+// Register service worker
+if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/service-worker.js');
+  });
+}
 // Import compiler to support JIT compilation
 import '@angular/compiler';
 
