@@ -6,7 +6,7 @@ A modern, responsive mytasks application built with Angular and Firebase. Featur
 
 - **User Authentication**: Secure login and registration using Firebase Auth
 - **Real-time Data**: Firestore database for instant updates across devices
-- **Responsive Design**: Works on desktop and mobile devices
+- **Responsive Design**: Works on desktop, tablet, and mobile devices
 - **Task Management**: Create, read, update and delete tasks
 - **Session Management**: Automatic session timeout for security
 
