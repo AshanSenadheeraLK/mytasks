@@ -1,5 +1,5 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, OnDestroy, Inject, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { DeviceService, DeviceType } from '../../../services/device.service';
 import { Subscription } from 'rxjs';
 
@@ -32,12 +32,20 @@ export class FooterComponent implements OnInit, OnDestroy {
   ];
 
   showBackToTop = false;
+  private isBrowser: boolean;
 
-  constructor(private deviceService: DeviceService) {
-    // Listen for scroll to handle back to top button
-    window.addEventListener('scroll', () => {
-      this.showBackToTop = window.scrollY > 200;
-    });
+  constructor(
+    private deviceService: DeviceService,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) {
+    this.isBrowser = isPlatformBrowser(this.platformId);
+    
+    // Only add event listener if in browser environment
+    if (this.isBrowser) {
+      window.addEventListener('scroll', () => {
+        this.showBackToTop = window.scrollY > 200;
+      });
+    }
   }
 
   ngOnInit(): void {
@@ -55,7 +63,9 @@ export class FooterComponent implements OnInit, OnDestroy {
   }
 
   backToTop() {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (this.isBrowser) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   }
 
   isMobile(): boolean {

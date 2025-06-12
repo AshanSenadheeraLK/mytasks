@@ -1,6 +1,16 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
 
+interface AiResponse {
+  candidates?: Array<{
+    content?: {
+      parts?: Array<{
+        text?: string;
+      }>;
+    };
+  }>;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AiAgentService {
   private apiUrl = environment.aiApiUrl;
@@ -9,6 +19,11 @@ export class AiAgentService {
   async sendPrompt(prompt: string): Promise<any> {
     if (!this.apiUrl || !this.apiKey) {
       console.warn('AI API not configured');
+      return null;
+    }
+
+    if (!prompt || typeof prompt !== 'string') {
+      console.error('Invalid prompt provided');
       return null;
     }
 
@@ -26,15 +41,27 @@ export class AiAgentService {
       });
 
       if (!response.ok) {
-        console.error('AI request failed', response.statusText);
+        const errorText = await response.text();
+        console.error('AI request failed:', response.status, errorText);
         return null;
       }
 
-      const data = await response.json();
+      const data: AiResponse = await response.json();
       const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-      return text ? JSON.parse(text) : data;
+      
+      if (!text) {
+        console.warn('AI response did not contain expected text format');
+        return null;
+      }
+
+      try {
+        return JSON.parse(text);
+      } catch (parseError) {
+        console.warn('Failed to parse AI response as JSON, returning raw text:', parseError);
+        return text;
+      }
     } catch (err) {
-      console.error('AI request error', err);
+      console.error('AI request error:', err);
       return null;
     }
   }

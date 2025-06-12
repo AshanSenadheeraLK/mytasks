@@ -157,12 +157,20 @@
     --transition-ease: all 0.3s ease;
     --accent-color: #3b82f6;
     --accent-hover: #2563eb;
+    --card-bg: #ffffff;
+    --card-border: #e2e8f0;
+    --text-primary: #1f2937;
+    --text-secondary: #4b5563;
   }
 
   .dark {
     --scrollbar-thumb: #4b5563;
     --accent-color: #3b82f6;
     --accent-hover: #60a5fa;
+    --card-bg: #1f2937;
+    --card-border: #374151;
+    --text-primary: #f3f4f6;
+    --text-secondary: #d1d5db;
   }
 }
 
@@ -188,7 +196,8 @@
   
   .card {
     @apply bg-cardBg dark:bg-cardBg-dark rounded-lg shadow-card dark:shadow-dark-card 
-           border border-border dark:border-border-dark p-4 transition-all duration-300;
+           border border-border dark:border-border-dark p-4 transition-all duration-300
+           dark:text-foreground-dark;
   }
   
   .card-hover {
@@ -197,8 +206,9 @@
   
   .form-input {
     @apply w-full border border-gray-300 dark:border-gray-600 px-4 py-2 rounded-md 
-           bg-white dark:bg-gray-700 text-gray-900 dark:text-white
-           focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all duration-200;
+           bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100
+           focus:outline-none focus:ring-2 focus:ring-accent dark:focus:ring-accent-light focus:border-transparent transition-all duration-200
+           placeholder:text-gray-500 dark:placeholder:text-gray-400;
   }
   
   .task-title {
@@ -220,7 +230,8 @@
   /* Enhanced components */
   .glass-card {
     @apply bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm 
-           border border-white/20 dark:border-gray-700/20 shadow-lg rounded-lg;
+           border border-white/20 dark:border-gray-700 shadow-lg dark:shadow-gray-900/30 rounded-lg
+           text-gray-800 dark:text-gray-100;
   }
   
   .nav-pill {
@@ -240,11 +251,11 @@
   }
   
   .status-badge-pending {
-    @apply bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300;
+    @apply bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200;
   }
   
   .status-badge-completed {
-    @apply bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300;
+    @apply bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200;
   }
   
   .checkbox-custom {
@@ -254,15 +265,18 @@
 
   /* Search input styling */
   .search-input {
-    @apply bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 
-           text-gray-900 dark:text-white rounded-lg focus:ring-accent 
-           focus:border-accent block w-full p-2.5 transition-all duration-200;
+    @apply bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 
+           text-gray-900 dark:text-gray-100 rounded-lg focus:ring-accent dark:focus:ring-accent-light
+           focus:border-accent dark:focus:border-accent-light block w-full p-2.5 transition-all duration-200
+           placeholder:text-gray-500 dark:placeholder:text-gray-400;
   }
 
   /* Task item styling */
   .task-item {
     @apply bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 
-           rounded-xl p-5 hover:shadow-md transition-all duration-300;
+           rounded-xl p-5 hover:shadow-md transition-all duration-300
+           border border-gray-200 dark:border-gray-700
+           text-gray-800 dark:text-gray-100;
   }
 
   .task-item-completed {
@@ -517,6 +531,19 @@
     transform: translateY(0);
     opacity: 1;
   }
+}
+
+/* Priority flag colors */
+.priority-high {
+  @apply text-red-600 dark:text-red-400;
+}
+
+.priority-medium {
+  @apply text-yellow-600 dark:text-yellow-400;
+}
+
+.priority-low {
+  @apply text-green-600 dark:text-green-400;
 }
 
 

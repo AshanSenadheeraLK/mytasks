@@ -338,7 +338,7 @@ export class TabletTodoListComponent implements OnInit {
       dueDate: 'Today',
       priority: 'High',
       isUrgent: true,
-      priorityColor: 'text-red-500 dark:text-red-400'
+      priorityColor: 'priority-high'
     },
     {
       title: 'Review analytics dashboard',
@@ -356,7 +356,7 @@ export class TabletTodoListComponent implements OnInit {
       dueDate: 'Tomorrow',
       priority: 'Medium',
       isUrgent: false,
-      priorityColor: 'text-yellow-500 dark:text-yellow-400'
+      priorityColor: 'priority-medium'
     },
     {
       title: 'Prepare meeting agenda',
@@ -365,7 +365,7 @@ export class TabletTodoListComponent implements OnInit {
       dueDate: 'Wednesday',
       priority: 'Low',
       isUrgent: false,
-      priorityColor: 'text-green-500 dark:text-green-400'
+      priorityColor: 'priority-low'
     },
     {
       title: 'Schedule doctor appointment',
@@ -374,7 +374,7 @@ export class TabletTodoListComponent implements OnInit {
       dueDate: 'Next week',
       priority: 'Medium',
       isUrgent: false,
-      priorityColor: 'text-yellow-500 dark:text-yellow-400'
+      priorityColor: 'priority-medium'
     },
     {
       title: 'Grocery shopping',
@@ -383,7 +383,7 @@ export class TabletTodoListComponent implements OnInit {
       dueDate: 'Weekend',
       priority: 'Low',
       isUrgent: false,
-      priorityColor: 'text-green-500 dark:text-green-400'
+      priorityColor: 'priority-low'
     }
   ];
   

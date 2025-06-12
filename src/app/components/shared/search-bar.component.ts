@@ -141,19 +141,19 @@ export interface SearchFilter {
           <div class="flex flex-wrap gap-1">
             <button 
               (click)="setPriorityFilter('low')" 
-              [class]="filterType === 'priority' && priorityValue === 'low' ? 'px-2 py-1 text-xs font-medium rounded-md bg-green-500 text-white' : 'px-2 py-1 text-xs font-medium rounded-md bg-green-100 text-green-800 hover:bg-green-200'"
+              [class]="filterType === 'priority' && priorityValue === 'low' ? 'px-2 py-1 text-xs font-medium rounded-md bg-green-500 text-white' : 'px-2 py-1 text-xs font-medium rounded-md bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-900/50'"
             >
               Low
             </button>
             <button 
               (click)="setPriorityFilter('medium')" 
-              [class]="filterType === 'priority' && priorityValue === 'medium' ? 'px-2 py-1 text-xs font-medium rounded-md bg-yellow-500 text-white' : 'px-2 py-1 text-xs font-medium rounded-md bg-yellow-100 text-yellow-800 hover:bg-yellow-200'"
+              [class]="filterType === 'priority' && priorityValue === 'medium' ? 'px-2 py-1 text-xs font-medium rounded-md bg-yellow-500 text-white' : 'px-2 py-1 text-xs font-medium rounded-md bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300 hover:bg-yellow-200 dark:hover:bg-yellow-900/50'"
             >
               Medium
             </button>
             <button 
               (click)="setPriorityFilter('high')" 
-              [class]="filterType === 'priority' && priorityValue === 'high' ? 'px-2 py-1 text-xs font-medium rounded-md bg-red-500 text-white' : 'px-2 py-1 text-xs font-medium rounded-md bg-red-100 text-red-800 hover:bg-red-200'"
+              [class]="filterType === 'priority' && priorityValue === 'high' ? 'px-2 py-1 text-xs font-medium rounded-md bg-red-500 text-white' : 'px-2 py-1 text-xs font-medium rounded-md bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-900/50'"
             >
               High
             </button>
@@ -285,7 +285,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
     this.emitCurrentFilter();
   }
   
-  private emitCurrentFilter(): void {
+  public emitCurrentFilter(): void {
     this.searchSubject.next({
       term: this.searchTerm,
       filterType: this.filterType,

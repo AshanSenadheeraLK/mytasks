@@ -104,11 +104,11 @@ import { trigger, transition, style, animate } from '@angular/animations';
               
               <div class="flex justify-between items-center">
                 <div class="priority-indicator flex items-center">
-                  <i class="bi bi-flag-fill text-red-500 dark:text-red-400 mr-1" 
+                  <i class="bi bi-flag-fill priority-high mr-1" 
                      *ngIf="i === 1 || i === 4"></i>
-                  <i class="bi bi-flag-fill text-yellow-500 dark:text-yellow-400 mr-1" 
+                  <i class="bi bi-flag-fill priority-medium mr-1" 
                      *ngIf="i === 3"></i>
-                  <span class="text-xs text-gray-500">
+                  <span class="text-xs text-gray-600 dark:text-gray-300">
                     {{i === 1 || i === 4 ? 'High' : i === 3 ? 'Medium' : ''}}
                   </span>
                 </div>

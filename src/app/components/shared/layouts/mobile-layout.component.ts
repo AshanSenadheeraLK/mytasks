@@ -8,12 +8,12 @@ import { ThemeToggleComponent } from '../theme-toggle.component';
   standalone: true,
   imports: [CommonModule, RouterLink, RouterLinkActive, ThemeToggleComponent],
   template: `
-    <div class="flex flex-col h-screen">
+    <div class="flex flex-col h-screen bg-background dark:bg-background-dark">
       <!-- Mobile Header -->
-      <header class="mobile-header">
+      <header class="mobile-header border-b border-gray-200 dark:border-gray-700">
         <div class="flex items-center">
-          <h1 class="text-xl font-bold">My Tasks</h1>
-          <span class="ml-2 px-2 py-0.5 text-xs bg-blue-100 dark:bg-blue-900/30 text-primary dark:text-blue-300 rounded-full">v1.3.0</span>
+          <h1 class="text-xl font-bold text-gray-800 dark:text-gray-100">My Tasks</h1>
+          <span class="ml-2 px-2 py-0.5 text-xs bg-blue-100 dark:bg-blue-900 text-primary dark:text-blue-200 rounded-full">v1.3.0</span>
         </div>
         <div class="flex items-center space-x-3">
           <app-theme-toggle></app-theme-toggle>
@@ -29,11 +29,11 @@ import { ThemeToggleComponent } from '../theme-toggle.component';
       </main>
       
       <!-- Bottom Navigation -->
-      <nav class="mobile-bottom-nav">
+      <nav class="mobile-bottom-nav border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
         <a routerLink="/app" 
            [routerLinkActiveOptions]="{exact: true}"
            routerLinkActive="active-nav-item" 
-           class="mobile-nav-item">
+           class="mobile-nav-item text-gray-600 dark:text-gray-300">
           <i class="bi bi-list-check mobile-nav-icon"></i>
           <span class="mobile-nav-text">Tasks</span>
         </a>
@@ -44,7 +44,7 @@ import { ThemeToggleComponent } from '../theme-toggle.component';
         </a>
         <a routerLink="/profile" 
            routerLinkActive="active-nav-item" 
-           class="mobile-nav-item">
+           class="mobile-nav-item text-gray-600 dark:text-gray-300">
           <i class="bi bi-person mobile-nav-icon"></i>
           <span class="mobile-nav-text">Profile</span>
         </a>
@@ -58,9 +58,28 @@ import { ThemeToggleComponent } from '../theme-toggle.component';
       height: 100%;
     }
     
+    .mobile-header {
+      @apply bg-white dark:bg-gray-800 flex justify-between items-center px-4 py-3 sticky top-0 z-10;
+    }
+    
+    .mobile-bottom-nav {
+      @apply fixed bottom-0 left-0 right-0 flex justify-around items-center py-1 px-2 z-10;
+    }
+    
+    .mobile-nav-item {
+      @apply flex flex-col items-center justify-center p-2;
+    }
+    
+    .mobile-nav-icon {
+      @apply text-xl mb-1 transition-transform;
+    }
+    
+    .mobile-nav-text {
+      @apply text-xs font-medium;
+    }
+    
     .active-nav-item {
-      color: var(--accent-color, #3b82f6);
-      font-weight: 500;
+      @apply text-accent dark:text-accent-light font-medium;
     }
     
     .active-nav-item .mobile-nav-icon {
