@@ -32,10 +32,8 @@ export class TaskChatService {
   constructor(private ai: AiAgentService, private todos: TodoService) {}
 
   async sendMessage(text: string): Promise<void> {
-    const messages: ChatMessage[] = [
-      ...this.messagesSubject.value,
-      { role: 'user', text }
-    ];
+   const messages = [...this.messagesSubject.value, { role: 'user', text }];
+
     this.messagesSubject.next(messages);
 
     const prompt = this.buildPrompt(messages);
@@ -57,6 +55,7 @@ export class TaskChatService {
 
   private buildPrompt(messages: ChatMessage[]): string {
     const conversation = messages.map(m => `${m.role}: ${m.text}`).join('\n');
+tethdq-codex/implement-ai-agent-for-task-management
     const system = `You are a task management assistant. When appropriate, respond in JSON like {
       "reply": "text",
       "actions": [{
@@ -69,6 +68,13 @@ export class TaskChatService {
         "tags": [],
         "completed": false
       }]}. Minimize other text.`;
+
+    const system =
+      'You are a task management assistant. When appropriate, respond in JSON like '\
+      + '{"reply":"text","actions":[{"type":"create|update|delete","id":"optional",' +
+      '"title":"","description":"","dueDate":"ISO","priority":"low|medium|high",' +
+      '"tags":[],"completed":false}]}. Minimize other text.';
+
     return `${system}\n${conversation}`;
   }
 
