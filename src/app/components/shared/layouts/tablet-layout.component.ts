@@ -31,6 +31,13 @@ import { CommonModule } from '@angular/common';
               </a>
             </li>
             <li>
+              <a routerLink="/app/chat" routerLinkActive="bg-accent/20 text-accent"
+                 class="flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors">
+                <i class="bi bi-chat-dots text-xl"></i>
+                <span>AI</span>
+              </a>
+            </li>
+            <li>
               <a routerLink="/profile" routerLinkActive="bg-accent/20 text-accent"
                  class="flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors">
                 <i class="bi bi-person text-xl"></i>
