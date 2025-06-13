@@ -29,9 +29,14 @@ export const routes: Routes = [
     component: TodoListComponent,
     canActivate: [AuthGuard]
   },
-  { 
-    path: 'profile', 
+  {
+    path: 'profile',
     loadComponent: () => import('./components/profile/profile.component').then(m => m.ProfileComponent),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'app/chat',
+    loadComponent: () => import('./components/task-chat/task-chat.component').then(m => m.TaskChatComponent),
     canActivate: [AuthGuard]
   },
   { path: '**', redirectTo: '' }
