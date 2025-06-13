@@ -42,8 +42,12 @@ import { ThemeToggleComponent } from '../theme-toggle.component';
             <i class="bi bi-plus-lg mobile-nav-icon mb-0"></i>
           </div>
         </a>
-        <a routerLink="/profile" 
-           routerLinkActive="active-nav-item" 
+        <a routerLink="/app/chat" routerLinkActive="active-nav-item" class="mobile-nav-item text-gray-600 dark:text-gray-300">
+          <i class="bi bi-chat-dots mobile-nav-icon"></i>
+          <span class="mobile-nav-text">AI</span>
+        </a>
+        <a routerLink="/profile"
+           routerLinkActive="active-nav-item"
            class="mobile-nav-item text-gray-600 dark:text-gray-300">
           <i class="bi bi-person mobile-nav-icon"></i>
           <span class="mobile-nav-text">Profile</span>
