@@ -14,6 +14,7 @@ interface AiAction {
   title?: string;
   description?: string;
   dueDate?: string;
+  dueTime?: string;
   priority?: 'low' | 'medium' | 'high';
   tags?: string[];
   completed?: boolean;
@@ -57,6 +58,46 @@ export class TaskChatService {
 
   private buildPrompt(messages: ChatMessage[]): string {
     const conversation = messages.map(m => `${m.role}: ${m.text}`).join('\n');
+    const system = `You are a task management assistant. Respond concisely and when needed include JSON like {"reply":"text","actions":[{"type":"create|update|delete|categorize","id":"optional","title":"","description":"","dueDate":"YYYY-MM-DD","dueTime":"HH:mm","priority":"low|medium|high","tags":[],"completed":false}]}. Always provide dueDate and dueTime if the user specifies them.`;
+    return `${system}\n${conversation}`;
+  }
+
+  private combineDateTime(date?: string, time?: string): Date | undefined {
+    if (!date && !time) return undefined;
+    const base = date ? new Date(date) : new Date();
+    if (isNaN(base.getTime())) return undefined;
+    if (time) {
+      const [h, m] = time.split(':').map(n => parseInt(n, 10));
+      if (!isNaN(h) && !isNaN(m)) {
+        base.setHours(h, m, 0, 0);
+      }
+    }
+    return base;
+  }
+
+  private async applyAction(action: AiAction): Promise<void> {
+    switch (action.type) {
+      case 'create':
+        const dueForCreate = this.combineDateTime(action.dueDate, action.dueTime);
+        const existing = this.todos.currentTodos.find(t =>
+          t.title === (action.title || 'Untitled') &&
+          (t.description || '') === (action.description || '')
+        );
+        if (existing) {
+          await this.todos.updateTodo(existing.id!, {
+            dueDate: dueForCreate ?? existing.dueDate,
+            priority: action.priority ?? existing.priority,
+            tags: action.tags ?? existing.tags
+          });
+        } else {
+          await this.todos.addTodo(
+            action.title || 'Untitled',
+            action.description,
+            dueForCreate,
+            action.priority || 'medium',
+            action.tags || []
+          );
+        }
     const system = `You are a task management assistant. When appropriate, respond in JSON like {
       "reply": "text",
       "actions": [{
@@ -88,6 +129,7 @@ export class TaskChatService {
           await this.todos.updateTodo(action.id, {
             title: action.title,
             description: action.description,
+            dueDate: this.combineDateTime(action.dueDate, action.dueTime),
             dueDate: action.dueDate ? new Date(action.dueDate) : undefined,
             priority: action.priority,
             tags: action.tags,
