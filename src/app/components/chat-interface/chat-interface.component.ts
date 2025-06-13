@@ -196,9 +196,8 @@ export class ChatInterfaceComponent implements OnInit, OnDestroy {
     this.sendMessage(prompt);
   }
 
-  trackByFn(_index: number, item: ChatMessage): string {
-    // Using the combination of role and text as a unique identifier
-    return `${item.role}-${item.text}`;
+  trackByFn(index: number, _item: ChatMessage): number {
+    return index;
   }
   
   adjustTextareaHeight(): void {

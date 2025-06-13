@@ -99,7 +99,7 @@ export class TaskChatService {
         await this.todos.addTodo(
           action.title || 'Untitled',
           action.description,
-          action.dueDate ? new Date(action.dueDate) : undefined,
+          this.combineDateTime(action.dueDate, action.dueTime),
           action.priority || 'medium',
           action.tags || []
         );
