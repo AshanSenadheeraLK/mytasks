@@ -49,6 +49,11 @@ export class TodoService implements OnDestroy {
   private db: Firestore | null = null;
   private todosSubject = new BehaviorSubject<Todo[]>([]);
   todos$ = this.todosSubject.asObservable();
+
+  /** Get a snapshot of current todos */
+  get currentTodos(): Todo[] {
+    return this.todosSubject.value;
+  }
   private unsubscribe?: Unsubscribe;
   private authSubscription?: Subscription;
   private destroy$ = new Subject<void>();
