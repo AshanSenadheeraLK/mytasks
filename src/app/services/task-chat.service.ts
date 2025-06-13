@@ -58,6 +58,29 @@ export class TaskChatService {
 
   private buildPrompt(messages: ChatMessage[]): string {
     const conversation = messages.map(m => `${m.role}: ${m.text}`).join('\n');
+    const tasks = this.todos.currentTodos
+      .map(t => {
+        const due = t.dueDate ? this.formatDate(t.dueDate) : '';
+        const tags = t.tags?.length ? ` [${t.tags.join(', ')}]` : '';
+        return `- (${t.id}) ${t.title}${t.description ? ` - ${t.description}` : ''}${due ? ` due ${due}` : ''}${tags}`;
+      })
+      .join('\n');
+
+    const system = `You are a task management assistant. You can create, update, delete and categorize tasks. When appropriate, respond in JSON like {"reply":"text","actions":[{"type":"create|update|delete|categorize","id":"optional","title":"","description":"","dueDate":"YYYY-MM-DD","dueTime":"HH:mm","priority":"low|medium|high","tags":[],"completed":false}]}. Always provide dueDate and dueTime if the user specifies them. Current tasks:\n${tasks || 'No tasks.'}`;
+    return `${system}\n${conversation}`;
+  }
+
+  private formatDate(date: any): string {
+    try {
+      const d = date.seconds ? new Date(date.seconds * 1000) : new Date(date);
+      if (isNaN(d.getTime())) return '';
+      return d.toISOString().slice(0, 16).replace('T', ' ');
+    } catch {
+      return '';
+    }
+  }
+
+
     const system = `You are a task management assistant. Respond concisely and when needed include JSON like {"reply":"text","actions":[{"type":"create|update|delete|categorize","id":"optional","title":"","description":"","dueDate":"YYYY-MM-DD","dueTime":"HH:mm","priority":"low|medium|high","tags":[],"completed":false}]}. Always provide dueDate and dueTime if the user specifies them.`;
     return `${system}\n${conversation}`;
   }
@@ -98,6 +121,32 @@ export class TaskChatService {
             action.tags || []
           );
         }
+
+    const system = `You are a task management assistant. When appropriate, respond in JSON like {
+      "reply": "text",
+      "actions": [{
+        "type": "create|update|delete|categorize",
+        "id": "optional",
+        "title": "",
+        "description": "",
+        "dueDate": "ISO",
+        "priority": "low|medium|high",
+        "tags": [],
+        "completed": false
+      }]}. Minimize other text.`;
+    return `${system}\n${conversation}`;
+  }
+
+  private async applyAction(action: AiAction): Promise<void> {
+    switch (action.type) {
+      case 'create':
+        await this.todos.addTodo(
+          action.title || 'Untitled',
+          action.description,
+          action.dueDate ? new Date(action.dueDate) : undefined,
+          action.priority || 'medium',
+          action.tags || []
+        );
         break;
       case 'update':
         if (action.id) {
@@ -105,6 +154,8 @@ export class TaskChatService {
             title: action.title,
             description: action.description,
             dueDate: this.combineDateTime(action.dueDate, action.dueTime),
+
+            dueDate: action.dueDate ? new Date(action.dueDate) : undefined,
             priority: action.priority,
             tags: action.tags,
             completed: action.completed
