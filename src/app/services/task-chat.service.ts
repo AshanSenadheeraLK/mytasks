@@ -9,7 +9,7 @@ export interface ChatMessage {
 }
 
 interface AiAction {
-  type: 'create' | 'update' | 'delete';
+  type: 'create' | 'update' | 'delete' | 'categorize';
   id?: string;
   title?: string;
   description?: string;
@@ -60,7 +60,7 @@ export class TaskChatService {
     const system = `You are a task management assistant. When appropriate, respond in JSON like {
       "reply": "text",
       "actions": [{
-        "type": "create|update|delete",
+        "type": "create|update|delete|categorize",
         "id": "optional",
         "title": "",
         "description": "",
@@ -98,6 +98,11 @@ export class TaskChatService {
       case 'delete':
         if (action.id) {
           await this.todos.deleteTodo(action.id);
+        }
+        break;
+      case 'categorize':
+        if (action.id && action.tags) {
+          await this.todos.updateTodo(action.id, { tags: action.tags });
         }
         break;
     }
