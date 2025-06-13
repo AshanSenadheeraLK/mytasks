@@ -35,11 +35,7 @@ export const routes: Routes = [
     canActivate: [AuthGuard]
   },
   {
- owoaq7-codex/implement-ai-agent-for-task-management
     path: 'app/chat',
-
-    path: 'chat',
- v2
     loadComponent: () => import('./components/task-chat/task-chat.component').then(m => m.TaskChatComponent),
     canActivate: [AuthGuard]
   },
