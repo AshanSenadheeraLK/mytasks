@@ -36,7 +36,7 @@ export const routes: Routes = [
   },
   {
     path: 'app/chat',
-    loadComponent: () => import('./components/task-chat/task-chat.component').then(m => m.TaskChatComponent),
+    loadComponent: () => import('./components/chat-interface/chat-interface.component').then(m => m.ChatInterfaceComponent),
     canActivate: [AuthGuard]
   },
   { path: '**', redirectTo: '' }
