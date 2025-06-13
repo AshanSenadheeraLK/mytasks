@@ -1,7 +1,8 @@
 import { Component, OnInit, OnDestroy, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { DeviceService, DeviceType } from '../../../services/device.service';
-import { Subscription } from 'rxjs';
+import { Subscription, fromEvent } from 'rxjs';
+import { throttleTime } from 'rxjs/operators';
 
 @Component({
   selector: 'app-footer',
@@ -12,23 +13,48 @@ import { Subscription } from 'rxjs';
 })
 export class FooterComponent implements OnInit, OnDestroy {
   title = 'MY TASKS - Task Management System';
-  description = 'A task management system that helps you manage your tasks and get things done.';
+  description = 'Organize, track, and accomplish your daily tasks with our intuitive and AI-powered task manager. Never miss a deadline again!';
   
   currentYear = new Date().getFullYear();
   currentDevice: DeviceType = 'desktop';
   private deviceSubscription: Subscription | null = null;
+  private scrollSubscription: Subscription | null = null;
+
+  version = '2.0.0 ~ Pre-Release Beta';
 
   socialLinks = [
     {
+      id: 'facebook',
       name: 'Facebook',
       url: 'https://www.facebook.com/ashan.senadheera.2025',
       icon: 'bi bi-facebook'
     },
     {
+      id: 'website',
       name: 'Website',
       url: 'http://ashansenadheera.lk',
       icon: 'bi bi-globe'
+    },
+    {
+      id: 'linkedin',
+      name: 'LinkedIn',
+      url: '',
+      icon: 'bi bi-linkedin'
+    },
+    {
+      id: 'github',
+      name: 'GitHub',
+      url: 'https://github.com/ashansenadheeralk',
+      icon: 'bi bi-github'
     }
+  ];
+
+  // Updated quick links
+  links = [
+    { name: 'Privacy Policy', url: '/privacy' },
+    { name: 'Terms of Service', url: '/terms' },
+    { name: 'Support', url: '/support' },
+    { name: 'About', url: '/about' }
   ];
 
   showBackToTop = false;
@@ -39,13 +65,6 @@ export class FooterComponent implements OnInit, OnDestroy {
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
     this.isBrowser = isPlatformBrowser(this.platformId);
-    
-    // Only add event listener if in browser environment
-    if (this.isBrowser) {
-      window.addEventListener('scroll', () => {
-        this.showBackToTop = window.scrollY > 200;
-      });
-    }
   }
 
   ngOnInit(): void {
@@ -53,21 +72,37 @@ export class FooterComponent implements OnInit, OnDestroy {
     this.deviceSubscription = this.deviceService.deviceType$.subscribe(deviceType => {
       this.currentDevice = deviceType;
     });
+
+    // Set up scroll listener for back-to-top button (browser only)
+    if (this.isBrowser) {
+      this.scrollSubscription = fromEvent(window, 'scroll')
+        .pipe(throttleTime(100))
+        .subscribe(() => {
+          this.showBackToTop = window.scrollY > 300;
+        });
+    }
   }
 
   ngOnDestroy(): void {
-    // Clean up subscription
+    // Clean up subscriptions
     if (this.deviceSubscription) {
       this.deviceSubscription.unsubscribe();
     }
-  }
-
-  backToTop() {
-    if (this.isBrowser) {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (this.scrollSubscription) {
+      this.scrollSubscription.unsubscribe();
     }
   }
 
+  backToTop(): void {
+    if (this.isBrowser) {
+      window.scrollTo({ 
+        top: 0, 
+        behavior: 'smooth' 
+      });
+    }
+  }
+
+  // Device detection methods
   isMobile(): boolean {
     return this.currentDevice === 'mobile';
   }
@@ -78,5 +113,10 @@ export class FooterComponent implements OnInit, OnDestroy {
 
   isDesktop(): boolean {
     return this.currentDevice === 'desktop';
+  }
+
+  // TrackBy function for performance optimization
+  trackById(index: number, item: any): any {
+    return item.id || index;
   }
 }

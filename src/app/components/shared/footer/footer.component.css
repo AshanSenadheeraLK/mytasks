@@ -1,88 +1,57 @@
-.footer {
-  color: #ffffff !important;
+/* Base footer styles */
+footer {
+  position: relative;
+  overflow: hidden;
 }
 
-.footer a {
-  color: #ffffff !important;
-  text-decoration: none !important;
+/* Override any bootstrap specific styles for proper tailwind alignment */
+.container {
+  width: 100%;
 }
 
-.footer .social-links {
-  display: flex;
-  flex-direction: row;
-  gap: 1.5rem;
-  align-items: center;
-  justify-content: center;
+/* Animation for back to top button */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
 }
 
-.footer a:hover {
-  color: #ffffff !important;
-  text-decoration: underline;
+/* Animation for background elements */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
 }
 
-.social-links a {
-  margin-right: 10px;
-  transition: opacity 0.2s;
+@keyframes ping {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  75%, 100% {
+    transform: scale(2);
+    opacity: 0;
+  }
 }
 
-.social-links a:hover {
-  opacity: 0.7;
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: .5;
+  }
 }
 
-.social-icon {
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: rgba(255, 255, 255, 0.1);
-  border-radius: 50%;
-  transition: background-color 0.3s;
-}
-
-.social-icon:hover {
-  background-color: rgba(255, 255, 255, 0.2);
-}
-
-.social-icon-sm {
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: rgba(255, 255, 255, 0.1);
-  border-radius: 50%;
-  transition: background-color 0.3s;
-}
-
-.social-icon-sm:hover {
-  background-color: rgba(255, 255, 255, 0.2);
-}
-
-/* Tablet footer specific styles */
-.tablet-footer {
-  padding-top: 3rem !important;
-  padding-bottom: 2rem !important;
-}
-
-.tablet-footer .social-links {
-  margin-bottom: 1rem;
-}
-
-.tablet-footer h5 {
-  margin-bottom: 1rem;
-}
-
-/* Mobile footer specific styles */
-.mobile-footer {
-  padding-top: 2rem !important;
-  padding-bottom: 1.5rem !important;
-}
-
-.mobile-footer .social-links {
-  margin-bottom: 0.75rem;
-}
-
-.small-text {
-  font-size: 0.8rem;
+/* Media queries for responsive design */
+@media (max-width: 768px) {
+  .social-links a {
+    width: 36px;
+    height: 36px;
+    font-size: 1rem;
+  }
 }

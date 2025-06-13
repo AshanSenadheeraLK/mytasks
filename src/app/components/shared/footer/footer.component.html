@@ -1,71 +1,125 @@
-<footer class="footer bg-primary text-light pt-5 pb-3 position-relative">
-  <!-- Desktop footer -->
-  <div class="container" *ngIf="isDesktop()">
-    <div class="row">
-      <div class="col-md-4 mb-4 mb-md-0">
-        <h5 class="fw-bold text-yellow-300">{{ title }}</h5>
-        <p>{{ description }}<br>
-          <br/>
-          <small class="text-muted">© {{ currentYear }} <span><a [href]='socialLinks[1].url' target="_blank">Ashan Senadheera.</a></span> All rights reserved.</small>
-        </p>
+<footer class="backdrop-blur-sm bg-gradient-to-br from-slate-900/90 via-blue-900/80 to-slate-900/90 
+              border-t border-white/20 text-white py-8 position-relative overflow-hidden">
+  
+  <!-- Animated background elements -->
+  <div class="absolute inset-0 overflow-hidden pointer-events-none">
+    <div class="absolute -top-40 -right-40 w-80 h-80 bg-blue-500/20 rounded-full blur-3xl animate-pulse"></div>
+    <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-indigo-500/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+    <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-60 h-60 bg-sky-500/10 rounded-full blur-2xl animate-ping delay-2000"></div>
+  </div>
+
+  <!-- Glass morphism overlay -->
+  <div class="absolute inset-0 bg-white/5 pointer-events-none"></div>
+  
+  <div class="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 position-relative z-10">
+    <!-- Skip link for accessibility -->
+    <a href="#main-content" 
+       class="sr-only sr-only-focusable position-absolute top-0 start-0 
+              bg-blue-600 text-white px-4 py-3 rounded-lg text-decoration-none z-50">
+      Skip to main content
+    </a>
+
+    <!-- Main footer content -->
+    <div [ngClass]="{'text-center': !isDesktop()}" 
+         class="footer-content"
+         role="contentinfo"
+         [attr.aria-label]="'Website footer'">
+      
+      <!-- Header section with enhanced glass effect -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+        <div class="col-span-1 md:col-span-2">
+          <div class="backdrop-blur-md bg-white/10 border border-white/20 rounded-xl p-5 hover:bg-white/15 transition-all duration-300">
+            <h2 class="text-xl md:text-2xl font-bold bg-gradient-to-r from-blue-400 to-sky-400 bg-clip-text text-transparent mb-4"> 
+              {{ title }}
+            </h2>
+            <p class="text-gray-300 leading-relaxed">
+              {{ description }}
+            </p>
+          </div>
+        </div>
+        
+        <!-- Enhanced social links with liquid glass buttons -->
+        <div class="col-span-1">
+          <div class="backdrop-blur-md bg-white/10 border border-white/20 rounded-xl p-5 hover:bg-white/15 transition-all duration-300 h-full">
+            <h3 class="text-lg font-semibold text-white mb-4">
+              Connect With Me
+            </h3>
+            <div class="flex flex-wrap gap-3" 
+                 role="navigation" 
+                 [attr.aria-label]="'Social media links'">
+              <a *ngFor="let link of socialLinks; trackBy: trackById"
+                 [href]="link.url"
+                 target="_blank"
+                 rel="noopener noreferrer"
+                 [attr.aria-label]="'Visit my ' + link.name + ' profile (opens in new tab)'"
+                 class="w-10 h-10 flex items-center justify-center rounded-lg
+                        backdrop-blur-md bg-white/10 border border-white/20
+                        hover:bg-white/20 hover:border-white/30
+                        transition-all duration-300 group">
+                <i [class]="link.icon" 
+                   [attr.aria-hidden]="true"
+                   class="text-lg text-white/90 group-hover:text-white"></i>
+                <span class="sr-only">{{ link.name }}</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick links section with glass effect -->
+        <div class="col-span-1" *ngIf="links && links.length > 0">
+          <div class="backdrop-blur-md bg-white/10 border border-white/20 rounded-xl p-5 hover:bg-white/15 transition-all duration-300 h-full">
+            <h3 class="text-lg font-semibold text-white mb-4">
+              Quick Links
+            </h3>
+            <nav role="navigation" 
+                 [attr.aria-label]="'Quick navigation links'">
+              <ul class="space-y-2">
+                <li *ngFor="let qLink of links">
+                  <a [href]="qLink.url" 
+                     class="text-gray-300 hover:text-white 
+                            transition-all duration-300 text-decoration-none block py-1">
+                    {{ qLink.name }}
+                  </a>
+                </li>
+              </ul>
+            </nav>
+          </div>
+        </div>
       </div>
-      <div class="col-md-4">
-        <h6 class="fw-bold">Connect</h6>
-        <div class="social-links">
-            <a [href]="socialLinks[0].url" target="_blank" class="text-light fs-5"><span [title]='socialLinks[0].name'>
-              <i [class]="socialLinks[0].icon"></i>
-            </span> </a>
-            <a [href]="socialLinks[1].url" target="_blank" class="text-light fs-5"><span [title]='socialLinks[1].name'>
-              <i [class]="socialLinks[1].icon"></i>
-            </span> </a>
+      
+      <!-- Enhanced copyright section with glass effect -->
+      <div class="border-t border-white/10 pt-6 text-center">
+        <div class="text-gray-400 text-sm">
+          <span>© {{ currentYear }}</span>
+          <a [href]="socialLinks[1].url" 
+             target="_blank" 
+             rel="noopener noreferrer"
+             class="mx-2 text-blue-400 hover:text-blue-300 transition-all duration-300">
+            Ashan Senadheera
+          </a>
+          <span>All rights reserved.</span>
         </div>
       </div>
     </div>
-    <button
-      *ngIf="showBackToTop"
-      (click)="backToTop()"
-      class="btn btn-outline-light position-absolute bottom-0 right-2 me-3 mb-3">
-      <i class="bi bi-arrow-up"></i> Top
-    </button>
-  </div>
 
-  <!-- Tablet footer -->
-  <div class="container tablet-footer" *ngIf="isTablet()">
-    <div class="text-center">
-      <h5 class="fw-bold text-yellow-300">{{ title }}</h5>
-      <p class="mb-2">{{ description }}</p>
-      <div class="social-links mb-3">
-        <a *ngFor="let link of socialLinks" [href]="link.url" target="_blank" class="social-icon">
-          <i [class]="link.icon"></i>
-        </a>
-      </div>
-      <small class="text-muted d-block">© {{ currentYear }} <a [href]='socialLinks[1].url' target="_blank">Ashan Senadheera.</a> All rights reserved.</small>
+    <!-- Display the version -->
+    <div class="text-center text-gray-400 text-sm">
+      <span>Version: {{ version }}</span>
     </div>
-    <button
-      *ngIf="showBackToTop"
-      (click)="backToTop()"
-      class="btn btn-outline-light btn-sm position-fixed bottom-0 end-0 m-3">
-      <i class="bi bi-arrow-up"></i>
-    </button>
-  </div>
-
-  <!-- Mobile footer -->
-  <div class="container mobile-footer" *ngIf="isMobile()">
-    <div class="text-center">
-      <h6 class="fw-bold text-yellow-300 mb-2">{{ title }}</h6>
-      <div class="social-links">
-        <a *ngFor="let link of socialLinks" [href]="link.url" target="_blank" class="social-icon-sm">
-          <i [class]="link.icon"></i>
-        </a>
-      </div>
-      <small class="text-muted d-block small-text">© {{ currentYear }} <a [href]='socialLinks[1].url' target="_blank">Ashan Senadheera</a></small>
-    </div>
-    <button
-      *ngIf="showBackToTop"
-      (click)="backToTop()"
-      class="btn btn-sm btn-outline-light position-fixed bottom-0 end-0 m-2">
+    
+    <!-- Enhanced floating back to top button -->
+    <button *ngIf="showBackToTop"
+            (click)="backToTop()"
+            type="button"
+            [attr.aria-label]="'Scroll back to top of page'"
+            class="fixed bottom-8 right-8 w-12 h-12 flex items-center justify-center
+                   backdrop-blur-md bg-gradient-to-r from-blue-500 to-sky-500 
+                   hover:from-blue-600 hover:to-sky-600
+                   text-white rounded-full border border-white/20 shadow-lg 
+                   hover:shadow-blue-500/25
+                   transition-all duration-300
+                   hover:scale-110 z-50">
       <i class="bi bi-arrow-up"></i>
     </button>
   </div>
 </footer>
-  
