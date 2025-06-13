@@ -57,6 +57,14 @@ export class AiAgentService {
       try {
         return JSON.parse(text);
       } catch (parseError) {
+        const match = text.match(/\{[\s\S]*\}/);
+        if (match) {
+          try {
+            return JSON.parse(match[0]);
+          } catch {
+            /* ignore */
+          }
+        }
         console.warn('Failed to parse AI response as JSON, returning raw text:', parseError);
         return text;
       }
