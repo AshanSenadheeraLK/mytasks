@@ -161,9 +161,14 @@ export class TodoService implements OnDestroy {
     recurring: 'daily' | 'weekly' | 'monthly' | null = null
   ): Promise<void> {
     if (!isPlatformBrowser(this.platformId) || !this.db) return;
-    
+
     const user = this.authService.getCurrentUser();
     if (!user) throw new Error('User not authenticated');
+
+    if (this.isDuplicate(title, dueDate)) {
+      console.warn('Duplicate todo detected, skipping add');
+      return;
+    }
 
     const todoData: Omit<Todo, 'id' | 'createdAt'> & { createdAt: any } = {
       title,
@@ -244,6 +249,16 @@ export class TodoService implements OnDestroy {
       console.error('Error sharing todo:', error);
       throw error;
     }
+  }
+
+  private isDuplicate(title: string, dueDate?: Date): boolean {
+    const normTitle = title.trim().toLowerCase();
+    const newDue = dueDate ? new Date(dueDate).getTime() : undefined;
+    return this.currentTodos.some(t => {
+      const tTitle = t.title.trim().toLowerCase();
+      const existingDue = t.dueDate ? new Date(t.dueDate as any).getTime() : undefined;
+      return tTitle === normTitle && existingDue === newDue;
+    });
   }
 
   ngOnDestroy(): void {
