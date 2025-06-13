@@ -7,17 +7,17 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: '#1E40AF', // Blue-800
+        primary: '#2563eb', // Changed to Blue-600 for better contrast
         accent: {
           DEFAULT: '#3b82f6',
           light: '#60a5fa',
-          dark: '#2563eb'
+          dark: '#1d4ed8'  // Darker blue for better contrast in dark mode
         },
-        accentDark: '#2563EB', // Blue-600
-        accentLight: '#60A5FA', // Blue-400
+        accentDark: '#3b82f6', // Brightened for dark mode
+        accentLight: '#93c5fd', // Lightened for better visibility
         background: {
           DEFAULT: '#f8fafc',
-          dark: '#111827'
+          dark: '#0f172a'  // Deeper dark background for better contrast
         },
         foreground: {
           DEFAULT: '#334155',
@@ -25,20 +25,25 @@ module.exports = {
         },
         border: {
           DEFAULT: '#e2e8f0',
-          dark: '#1f2937'
+          dark: '#1e293b'  // Slightly lighter for better visibility
         },
         completed: {
           DEFAULT: '#9ca3af',
           dark: '#6b7280'
         },
-        success: '#10B981', // Green-500
-        warning: '#F59E0B', // Amber-500
-        error: '#EF4444', // Red-500
-        info: '#3B82F6', // Blue-500
+        success: '#10b981', // Green-500
+        warning: '#f59e0b', // Amber-500
+        error: '#ef4444', // Red-500
+        info: '#3b82f6', // Blue-500
         cardBg: {
           DEFAULT: 'white',
-          dark: '#1f2937'
+          dark: '#1e293b'  // Slightly lighter than background-dark for contrast
         },
+        // Adding new subtle background colors for hover states
+        hover: {
+          light: '#f1f5f9',  // Slate-100
+          dark: '#334155'    // Slate-700
+        }
       },
       fontFamily: {
         'sans': ['Space Grotesk', 'ui-sans-serif', 'system-ui', 'sans-serif'],
@@ -51,13 +56,17 @@ module.exports = {
         'dropdown': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
         'button': '0 1px 2px rgba(0, 0, 0, 0.05)',
         'button-hover': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-        'dark-card': '0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.1)',
-        'dark-card-hover': '0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.15)'
+        'dark-card': '0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.15)',
+        'dark-card-hover': '0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.15)',
+        'inner-light': 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.05)',
+        'inner-dark': 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.25)'
       },
       animation: {
         'fade-in': 'fadeIn 0.3s ease-in-out',
         'slide-up': 'slideUp 0.4s ease-out',
         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'bounce-sm': 'bounceSm 0.6s ease-in-out',
+        'scale-in': 'scaleIn 0.2s ease-out',
       },
       keyframes: {
         fadeIn: {
@@ -68,6 +77,14 @@ module.exports = {
           '0%': { transform: 'translateY(10px)', opacity: '0' },
           '100%': { transform: 'translateY(0)', opacity: '1' },
         },
+        bounceSm: {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-3px)' }
+        },
+        scaleIn: {
+          '0%': { transform: 'scale(0.95)', opacity: '0' },
+          '100%': { transform: 'scale(1)', opacity: '1' }
+        }
       },
       borderRadius: {
         'xl': '0.75rem',

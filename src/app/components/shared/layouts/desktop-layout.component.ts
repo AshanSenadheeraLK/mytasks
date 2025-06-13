@@ -6,8 +6,11 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <!-- This is the original desktop layout, keeping it as is for existing desktop UI -->
-    <ng-content></ng-content>
+    <div class="min-h-screen bg-background dark:bg-background-dark transition-colors duration-300">
+      <main class="container mx-auto p-6 animate-fade-in">
+        <ng-content></ng-content>
+      </main>
+    </div>
   `,
   styles: [`
     :host {

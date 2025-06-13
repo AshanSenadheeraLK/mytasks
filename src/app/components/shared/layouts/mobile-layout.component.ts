@@ -8,28 +8,28 @@ import { ThemeToggleComponent } from '../theme-toggle.component';
   standalone: true,
   imports: [CommonModule, RouterLink, RouterLinkActive, ThemeToggleComponent],
   template: `
-    <div class="flex flex-col h-screen bg-background dark:bg-background-dark">
+    <div class="flex flex-col h-screen bg-background dark:bg-background-dark transition-colors duration-300">
       <!-- Mobile Header -->
-      <header class="mobile-header border-b border-gray-200 dark:border-gray-700">
+      <header class="mobile-header sticky top-0 z-30 glass-effect">
         <div class="flex items-center">
-          <h1 class="text-xl font-bold text-gray-800 dark:text-gray-100">My Tasks</h1>
-          <span class="ml-2 px-2 py-0.5 text-xs bg-blue-100 dark:bg-blue-900 text-primary dark:text-blue-200 rounded-full">v1.3.0</span>
+          <h1 class="text-xl font-bold text-gray-800 dark:text-white">My Tasks</h1>
+          <span class="ml-2 px-2 py-0.5 text-xs bg-accent/10 dark:bg-accent-dark/20 text-accent dark:text-accent-light rounded-full">v1.3.0</span>
         </div>
         <div class="flex items-center space-x-3">
           <app-theme-toggle></app-theme-toggle>
-          <button routerLink="/profile" class="btn btn-secondary p-2 text-lg">
+          <button routerLink="/profile" class="btn-ghost p-2 text-lg rounded-full a11y-focus active-state">
             <i class="bi bi-person"></i>
           </button>
         </div>
       </header>
       
       <!-- Main Content -->
-      <main class="flex-1 overflow-y-auto p-3 pb-20">
+      <main class="flex-1 overflow-y-auto p-4 pb-20 animate-fade-in">
         <ng-content></ng-content>
       </main>
       
       <!-- Bottom Navigation -->
-      <nav class="mobile-bottom-nav border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+      <nav class="mobile-bottom-nav fixed bottom-0 left-0 right-0 glass-effect py-1 z-40">
         <a routerLink="/app" 
            [routerLinkActiveOptions]="{exact: true}"
            routerLinkActive="active-nav-item" 
@@ -38,7 +38,7 @@ import { ThemeToggleComponent } from '../theme-toggle.component';
           <span class="mobile-nav-text">Tasks</span>
         </a>
         <a routerLink="/app/new" class="mobile-nav-item add-button">
-          <div class="bg-accent text-white rounded-full p-2.5 shadow-md">
+          <div class="bg-accent dark:bg-accent-light text-white dark:text-gray-900 rounded-full p-3 shadow-md transform transition-transform hover:scale-110 active:scale-95">
             <i class="bi bi-plus-lg mobile-nav-icon mb-0"></i>
           </div>
         </a>
@@ -63,23 +63,25 @@ import { ThemeToggleComponent } from '../theme-toggle.component';
     }
     
     .mobile-header {
-      @apply bg-white dark:bg-gray-800 flex justify-between items-center px-4 py-3 sticky top-0 z-10;
+      @apply bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm flex justify-between items-center px-4 py-3 
+             border-b border-gray-200 dark:border-gray-700 shadow-sm;
     }
     
     .mobile-bottom-nav {
-      @apply fixed bottom-0 left-0 right-0 flex justify-around items-center py-1 px-2 z-10;
+      @apply bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm flex justify-around items-center py-1 px-2
+             border-t border-gray-200 dark:border-gray-700 shadow-lg;
     }
     
     .mobile-nav-item {
-      @apply flex flex-col items-center justify-center p-2;
+      @apply flex flex-col items-center justify-center p-2 transition-colors duration-300;
     }
     
     .mobile-nav-icon {
-      @apply text-xl mb-1 transition-transform;
+      @apply text-xl mb-1 transition-transform duration-300;
     }
     
     .mobile-nav-text {
-      @apply text-xs font-medium;
+      @apply text-xs font-medium transition-colors duration-300;
     }
     
     .active-nav-item {
@@ -87,11 +89,11 @@ import { ThemeToggleComponent } from '../theme-toggle.component';
     }
     
     .active-nav-item .mobile-nav-icon {
-      transform: scale(1.1);
+      @apply transform scale-110;
     }
     
     .add-button {
-      margin-top: -20px;
+      @apply mt-[-20px];
     }
   `]
 })
