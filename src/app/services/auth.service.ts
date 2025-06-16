@@ -487,9 +487,4 @@ export class AuthService {
     return this.login('demo@example.com', 'password');  
   }  
   
-  // Facebook Login   
-  facebookLogin(): Promise<any> {    
-    // Implement Facebook authentication or modify this if already implemented    
-    return this.login('demo@example.com', 'password');  
-  }
 } 

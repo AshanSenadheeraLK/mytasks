@@ -25,12 +25,6 @@ export class FooterComponent implements OnInit, OnDestroy {
 
   socialLinks = [
     {
-      id: 'facebook',
-      name: 'Facebook',
-      url: 'https://www.facebook.com/ashan.senadheera.2025',
-      icon: 'bi bi-facebook'
-    },
-    {
       id: 'website',
       name: 'Website',
       url: 'http://ashansenadheera.lk',

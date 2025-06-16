@@ -8,6 +8,13 @@ module.exports = {
     extend: {
       colors: {
         primary: '#2563eb', // Changed to Blue-600 for better contrast
+        base: {
+          blue: '#1d4ed8',
+          black: '#000000',
+          green: '#16a34a',
+          yellow: '#facc15',
+          red: '#ef4444'
+        },
         accent: {
           DEFAULT: '#3b82f6',
           light: '#60a5fa',
