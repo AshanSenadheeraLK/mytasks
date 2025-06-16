@@ -1,12 +1,14 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { NavigationEnd, Router, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-desktop-layout',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   template: `
     <div class="min-h-screen bg-background dark:bg-background-dark transition-colors duration-300">
+      
       <main class="container mx-auto p-6 animate-fade-in">
         <ng-content></ng-content>
       </main>
@@ -20,4 +22,5 @@ import { CommonModule } from '@angular/common';
     }
   `]
 })
-export class DesktopLayoutComponent {} 
+export class DesktopLayoutComponent {
+}

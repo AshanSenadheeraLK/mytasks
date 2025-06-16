@@ -1,68 +1,78 @@
 <div class="flex flex-col h-full">
   <div class="card animate-fade-in">
+    <!-- Enhanced Header -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-      <h1 class="text-2xl font-semibold text-gray-800 dark:text-white flex items-center gap-2">
-        My Tasks
-        <span class="bg-accent/10 dark:bg-accent-dark/20 text-accent dark:text-accent-light text-xs px-2 py-0.5 rounded-full">
-          <i class="bi bi-graph-up-arrow mr-1"></i>12 tasks
-        </span>
-      </h1>
+      <div class="flex items-center">
+        <i class="bi bi-check2-circle text-accent dark:text-accent-light text-2xl mr-3"></i>
+        <div>
+          <h1 class="text-2xl font-semibold text-gray-800 dark:text-white flex items-center gap-2">
+            My Tasks
+            <span class="bg-accent/15 dark:bg-accent-dark/25 text-accent dark:text-accent-light text-xs px-2.5 py-1 rounded-full font-medium">
+              <i class="bi bi-graph-up-arrow mr-1.5"></i>12 tasks
+            </span>
+          </h1>
+          <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Track, manage, and complete your daily tasks</p>
+        </div>
+      </div>
+      
       <div class="flex items-center space-x-3">
-        <button class="btn btn-primary active-state flex items-center">
+        <button class="btn btn-primary active-state flex items-center shadow-md hover:shadow-lg transition-all">
           <i class="bi bi-plus-circle mr-2"></i>
           Add Task
         </button>
-        <button class="btn btn-secondary active-state">
+        <button class="btn btn-secondary active-state shadow-sm hover:shadow-md transition-all">
           <i class="bi bi-funnel"></i>
         </button>
       </div>
     </div>
 
-    <!-- Search and Filters Row -->
+    <!-- Enhanced Search and Filters Row -->
     <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between mb-6 gap-4">
       <div class="relative flex-grow max-w-md">
-        <input type="text" placeholder="Search tasks..." class="search-input pl-10 a11y-focus" />
-        <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400 dark:text-gray-500">
+        <input type="text" placeholder="Search tasks..." class="search-input pl-10 a11y-focus rounded-full" />
+        <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-gray-400 dark:text-gray-500">
           <i class="bi bi-search"></i>
         </span>
       </div>
       
       <div class="flex items-center gap-2 flex-wrap">
-        <button class="sort-btn sort-btn-active active-state">
-          <i class="bi bi-calendar-date mr-1"></i> Date
+        <button class="sort-btn sort-btn-active active-state shadow-sm hover:shadow md">
+          <i class="bi bi-calendar-date mr-1.5"></i> Date
         </button>
-        <button class="sort-btn active-state">
-          <i class="bi bi-exclamation-triangle mr-1"></i> Priority
+        <button class="sort-btn active-state shadow-sm hover:shadow md">
+          <i class="bi bi-exclamation-triangle mr-1.5"></i> Priority
         </button>
-        <button class="sort-btn active-state">
-          <i class="bi bi-check2-circle mr-1"></i> Status
+        <button class="sort-btn active-state shadow-sm hover:shadow md">
+          <i class="bi bi-check2-circle mr-1.5"></i> Status
         </button>
       </div>
     </div>
 
-    <!-- Task Lists - Two Columns -->
+    <!-- Task Lists - Two Columns with Enhanced Styling -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
       <!-- Left Column -->
       <div class="h-[calc(100vh-320px)] overflow-y-auto pr-2 custom-scrollbar">
         <div class="space-y-4">
-          <!-- Task Item 1 -->
+          <!-- Enhanced Task Item 1 -->
           <div class="task-item flex items-start justify-between group hover-lift">
-            <div class="flex items-start space-x-3 flex-grow">
-              <div class="mt-1">
-                <input type="checkbox" class="checkbox-custom a11y-focus" />
+            <div class="flex items-start space-x-3.5 flex-grow">
+              <div class="mt-1.5">
+                <button class="checkbox-custom-btn a11y-focus" aria-label="Mark task as complete">
+                  <i class="bi bi-check text-white transform scale-0 group-hover:scale-90 transition-transform"></i>
+                </button>
               </div>
               <div class="flex-grow">
-                <h3 class="task-title mb-1">Complete UI/UX Improvements</h3>
-                <p class="text-sm text-gray-600 dark:text-gray-300 mb-2">Enhance the user interface and fix design issues</p>
-                <div class="flex items-center flex-wrap gap-2 text-xs">
+                <h3 class="task-title text-base font-medium mb-1">Complete UI/UX Improvements</h3>
+                <p class="text-sm text-gray-600 dark:text-gray-300 mb-2.5">Enhance the user interface and fix design issues</p>
+                <div class="flex items-center flex-wrap gap-2.5 text-xs">
                   <span class="status-badge status-badge-pending">
-                    <i class="bi bi-hourglass-split mr-1"></i>In Progress
+                    <i class="bi bi-hourglass-split mr-1.5"></i>In Progress
                   </span>
                   <span class="text-gray-500 dark:text-gray-400 flex items-center">
-                    <i class="bi bi-calendar3 mr-1"></i> Today
+                    <i class="bi bi-calendar3 mr-1.5"></i> Today
                   </span>
                   <span class="priority-high flex items-center">
-                    <i class="bi bi-flag-fill mr-1"></i> High
+                    <i class="bi bi-flag-fill mr-1.5"></i> High
                   </span>
                 </div>
               </div>
@@ -77,24 +87,26 @@
             </div>
           </div>
 
-          <!-- Task Item 2 -->
-          <div class="task-item task-item-completed flex items-start justify-between group hover-lift opacity-75">
-            <div class="flex items-start space-x-3 flex-grow">
-              <div class="mt-1">
-                <input type="checkbox" class="checkbox-custom a11y-focus" checked />
+          <!-- Enhanced Task Item 2 -->
+          <div class="task-item task-item-completed flex items-start justify-between group hover-lift opacity-80">
+            <div class="flex items-start space-x-3.5 flex-grow">
+              <div class="mt-1.5">
+                <button class="checkbox-custom-btn checkbox-checked a11y-focus" aria-label="Mark task as incomplete">
+                  <i class="bi bi-check text-white"></i>
+                </button>
               </div>
               <div class="flex-grow">
-                <h3 class="task-title task-completed mb-1">Setup development environment</h3>
-                <p class="text-sm text-gray-500 dark:text-gray-400 mb-2 task-completed">Install necessary tools and dependencies</p>
-                <div class="flex items-center flex-wrap gap-2 text-xs">
+                <h3 class="task-title task-completed text-base font-medium mb-1">Setup development environment</h3>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mb-2.5 task-completed">Install necessary tools and dependencies</p>
+                <div class="flex items-center flex-wrap gap-2.5 text-xs">
                   <span class="status-badge status-badge-completed">
-                    <i class="bi bi-check-circle mr-1"></i>Completed
+                    <i class="bi bi-check-circle mr-1.5"></i>Completed
                   </span>
                   <span class="text-gray-500 dark:text-gray-400 flex items-center">
-                    <i class="bi bi-calendar3 mr-1"></i> Yesterday
+                    <i class="bi bi-calendar3 mr-1.5"></i> Yesterday
                   </span>
                   <span class="priority-medium flex items-center opacity-75">
-                    <i class="bi bi-flag-fill mr-1"></i> Medium
+                    <i class="bi bi-flag-fill mr-1.5"></i> Medium
                   </span>
                 </div>
               </div>
@@ -114,24 +126,26 @@
       <!-- Right Column -->
       <div class="h-[calc(100vh-320px)] overflow-y-auto pl-2 custom-scrollbar">
         <div class="space-y-4">
-          <!-- Task Item 3 -->
+          <!-- Enhanced Task Item 3 -->
           <div class="task-item flex items-start justify-between group hover-lift">
-            <div class="flex items-start space-x-3 flex-grow">
-              <div class="mt-1">
-                <input type="checkbox" class="checkbox-custom a11y-focus" />
+            <div class="flex items-start space-x-3.5 flex-grow">
+              <div class="mt-1.5">
+                <button class="checkbox-custom-btn a11y-focus" aria-label="Mark task as complete">
+                  <i class="bi bi-check text-white transform scale-0 group-hover:scale-90 transition-transform"></i>
+                </button>
               </div>
               <div class="flex-grow">
-                <h3 class="task-title mb-1">Design new dashboard</h3>
-                <p class="text-sm text-gray-600 dark:text-gray-300 mb-2">Create wireframes and mockups for the dashboard view</p>
-                <div class="flex items-center flex-wrap gap-2 text-xs">
+                <h3 class="task-title text-base font-medium mb-1">Design new dashboard</h3>
+                <p class="text-sm text-gray-600 dark:text-gray-300 mb-2.5">Create wireframes and mockups for the dashboard view</p>
+                <div class="flex items-center flex-wrap gap-2.5 text-xs">
                   <span class="status-badge status-badge-pending">
-                    <i class="bi bi-hourglass-split mr-1"></i>In Progress
+                    <i class="bi bi-hourglass-split mr-1.5"></i>In Progress
                   </span>
                   <span class="text-gray-500 dark:text-gray-400 flex items-center">
-                    <i class="bi bi-calendar3 mr-1"></i> Tomorrow
+                    <i class="bi bi-calendar3 mr-1.5"></i> Tomorrow
                   </span>
                   <span class="priority-medium flex items-center">
-                    <i class="bi bi-flag-fill mr-1"></i> Medium
+                    <i class="bi bi-flag-fill mr-1.5"></i> Medium
                   </span>
                 </div>
               </div>
@@ -146,24 +160,26 @@
             </div>
           </div>
 
-          <!-- Task Item 4 -->
+          <!-- Enhanced Task Item 4 -->
           <div class="task-item flex items-start justify-between group hover-lift">
-            <div class="flex items-start space-x-3 flex-grow">
-              <div class="mt-1">
-                <input type="checkbox" class="checkbox-custom a11y-focus" />
+            <div class="flex items-start space-x-3.5 flex-grow">
+              <div class="mt-1.5">
+                <button class="checkbox-custom-btn a11y-focus" aria-label="Mark task as complete">
+                  <i class="bi bi-check text-white transform scale-0 group-hover:scale-90 transition-transform"></i>
+                </button>
               </div>
               <div class="flex-grow">
-                <h3 class="task-title mb-1">Update documentation</h3>
-                <p class="text-sm text-gray-600 dark:text-gray-300 mb-2">Review and update the developer documentation</p>
-                <div class="flex items-center flex-wrap gap-2 text-xs">
+                <h3 class="task-title text-base font-medium mb-1">Update documentation</h3>
+                <p class="text-sm text-gray-600 dark:text-gray-300 mb-2.5">Review and update the developer documentation</p>
+                <div class="flex items-center flex-wrap gap-2.5 text-xs">
                   <span class="status-badge status-badge-pending">
-                    <i class="bi bi-hourglass-split mr-1"></i>Not Started
+                    <i class="bi bi-hourglass-split mr-1.5"></i>Not Started
                   </span>
                   <span class="text-gray-500 dark:text-gray-400 flex items-center">
-                    <i class="bi bi-calendar3 mr-1"></i> Next Week
+                    <i class="bi bi-calendar3 mr-1.5"></i> Next Week
                   </span>
                   <span class="priority-low flex items-center">
-                    <i class="bi bi-flag-fill mr-1"></i> Low
+                    <i class="bi bi-flag-fill mr-1.5"></i> Low
                   </span>
                 </div>
               </div>
@@ -181,38 +197,35 @@
       </div>
     </div>
 
-    <!-- Pagination -->
+    <!-- Enhanced Pagination -->
     <div class="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 pt-4">
       <div class="text-sm text-gray-600 dark:text-gray-400">
-        Showing <span class="font-medium">1-4</span> of <span class="font-medium">12</span> tasks
+        Showing <span class="font-medium text-gray-800 dark:text-gray-200">1-4</span> of <span class="font-medium text-gray-800 dark:text-gray-200">12</span> tasks
       </div>
       <div class="flex items-center space-x-2">
-        <button class="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed active-state" disabled>
+        <button class="px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed active-state" disabled>
           <i class="bi bi-chevron-left"></i>
         </button>
-        <button class="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 active-state">
+        <button class="px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 active-state">
           <i class="bi bi-chevron-right"></i>
         </button>
       </div>
     </div>
   </div>
 
-  <!-- Empty State -->
-  <div class="hidden text-center py-20 card animate-fade-in">
-    <div class="text-6xl text-gray-300 dark:text-gray-600 mb-4">
-      <i class="bi bi-check2-all"></i>
+  <!-- Empty State (Enhanced) -->
+  <div class="hidden">
+    <div class="flex flex-col items-center justify-center h-[60vh] text-center px-4">
+      <div class="bg-accent/10 dark:bg-accent-dark/20 p-6 rounded-full mb-4">
+        <i class="bi bi-clipboard text-4xl text-accent dark:text-accent-light"></i>
+      </div>
+      <h3 class="text-xl font-semibold text-gray-800 dark:text-white mb-2">No tasks yet</h3>
+      <p class="text-gray-500 dark:text-gray-400 mb-6 max-w-md">Your task list is empty. Create your first task to start being more productive.</p>
+      <button class="btn btn-primary flex items-center px-5 py-2.5">
+        <i class="bi bi-plus-circle mr-2"></i>
+        Create First Task
+      </button>
     </div>
-    <h3 class="text-xl font-medium text-gray-700 dark:text-gray-300 mb-2">No tasks yet</h3>
-    <p class="text-gray-500 dark:text-gray-400 mb-6">Create your first task to get started</p>
-    <button class="btn btn-primary active-state mx-auto">
-      <i class="bi bi-plus-circle mr-2"></i>
-      Add Your First Task
-    </button>
   </div>
-
-  <!-- Floating Action Button for Mobile -->
-  <button class="fab lg:hidden active-state animate-fade-in">
-    <i class="bi bi-plus text-xl"></i>
-  </button>
 </div>
  

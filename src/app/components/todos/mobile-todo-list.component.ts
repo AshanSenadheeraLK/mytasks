@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { trigger, transition, style, animate } from '@angular/animations';
+import { trigger, transition, style, animate, query, stagger } from '@angular/animations';
 
 @Component({
   selector: 'app-mobile-todo-list',
@@ -19,80 +19,106 @@ import { trigger, transition, style, animate } from '@angular/animations';
         style({ opacity: 0 }),
         animate('200ms ease-out', style({ opacity: 1 }))
       ])
+    ]),
+    trigger('staggeredItems', [
+      transition(':enter', [
+        query(':enter', [
+          style({ opacity: 0, transform: 'translateY(10px)' }),
+          stagger('100ms', [
+            animate('300ms ease-out', style({ opacity: 1, transform: 'translateY(0)' }))
+          ])
+        ], { optional: true })
+      ])
     ])
   ],
   template: `
-    <div class="mobile-container">
-      <!-- Mobile Header -->
+    <div class="mobile-container animate-fade-in">
+      <!-- Enhanced Mobile Header -->
       <div class="mobile-header sticky top-0 z-10">
-        <h1 class="text-lg font-semibold">My Tasks</h1>
+        <h1 class="text-lg font-semibold flex items-center">
+          <i class="bi bi-check2-circle text-accent dark:text-accent-light mr-2"></i>
+          My Tasks
+        </h1>
         <div class="flex space-x-2">
-          <button class="p-2 rounded-full bg-gray-100 dark:bg-gray-700" aria-label="Filter tasks">
+          <button class="p-2 rounded-full bg-gray-100 dark:bg-gray-700 active-state" 
+                  aria-label="Filter tasks">
             <i class="bi bi-funnel text-gray-600 dark:text-gray-300"></i>
+          </button>
+          <button class="p-2 rounded-full bg-gray-100 dark:bg-gray-700 active-state"
+                  aria-label="Sort tasks">
+            <i class="bi bi-sort-down text-gray-600 dark:text-gray-300"></i>
           </button>
         </div>
       </div>
 
-      <!-- Search -->
+      <!-- Enhanced Search -->
       <div class="px-4 mb-4">
         <div class="relative">
           <input type="text" 
                  placeholder="Search tasks..." 
-                 class="search-input pl-10 rounded-full"
+                 class="search-input pl-10 rounded-full shadow-sm focus:shadow-md transition-shadow"
                  aria-label="Search tasks">
-          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
             <i class="bi bi-search text-gray-400"></i>
           </div>
         </div>
       </div>
 
-      <!-- Filters - Horizontal scroll without scrollbar appearance -->
+      <!-- Enhanced Filters - Horizontal scroll -->
       <div class="filter-tabs px-4">
-        <div class="flex gap-2 overflow-x-auto pb-2 mb-3 no-scrollbar">
-          <button class="nav-pill nav-pill-active whitespace-nowrap" 
+        <div class="flex gap-2 overflow-x-auto pb-2 mb-4 no-scrollbar">
+          <button class="nav-pill nav-pill-active whitespace-nowrap shadow-sm" 
                   aria-pressed="true">
-            All Tasks
+            <i class="bi bi-collection mr-1.5"></i> All Tasks
           </button>
-          <button class="nav-pill nav-pill-inactive whitespace-nowrap" 
+          <button class="nav-pill nav-pill-inactive whitespace-nowrap shadow-sm" 
                   aria-pressed="false">
-            Active
+            <i class="bi bi-hourglass-split mr-1.5"></i> Active
           </button>
-          <button class="nav-pill nav-pill-inactive whitespace-nowrap" 
+          <button class="nav-pill nav-pill-inactive whitespace-nowrap shadow-sm" 
                   aria-pressed="false">
-            Completed
+            <i class="bi bi-check-circle mr-1.5"></i> Completed
           </button>
-          <button class="nav-pill nav-pill-inactive whitespace-nowrap" 
+          <button class="nav-pill nav-pill-inactive whitespace-nowrap shadow-sm" 
                   aria-pressed="false">
-            Important
+            <i class="bi bi-flag-fill mr-1.5"></i> Important
           </button>
         </div>
       </div>
       
-      <!-- Tasks List - Card View optimized for Mobile -->
-      <div class="task-list px-4" [@listAnimation]>
-        <!-- No tasks state -->
-        <div *ngIf="false" class="empty-state text-center py-10">
-          <div class="icon-empty mb-4">
-            <i class="bi bi-clipboard text-4xl text-gray-300 dark:text-gray-600"></i>
+      <!-- Tasks List with Animation -->
+      <div class="task-list px-4" [@staggeredItems]>
+        <!-- No tasks state - Enhanced -->
+        <div *ngIf="false" class="empty-state">
+          <div class="flex flex-col items-center justify-center py-10 px-4 text-center">
+            <div class="bg-accent/10 dark:bg-accent-dark/20 p-5 rounded-full mb-4">
+              <i class="bi bi-clipboard text-3xl text-accent dark:text-accent-light"></i>
+            </div>
+            <h3 class="text-lg font-medium mb-2">No tasks yet</h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mb-5 max-w-xs">
+              Your task list is empty. Add your first task to get organized!
+            </p>
+            <button class="btn btn-primary flex items-center shadow-md">
+              <i class="bi bi-plus-circle mr-2"></i> Create Task
+            </button>
           </div>
-          <h3 class="text-lg font-medium mb-1">No tasks yet</h3>
-          <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Tap the + button to create your first task</p>
         </div>
 
-        <!-- Task Items -->
-        <div *ngFor="let i of [1, 2, 3, 4, 5]" class="task-item relative mb-3 p-4 rounded-xl" [@itemAnimation]>
+        <!-- Enhanced Task Items -->
+        <div *ngFor="let i of [1, 2, 3, 4, 5]" class="task-item relative mb-4 p-4 rounded-xl shadow-sm hover:shadow-md transition-shadow" [@itemAnimation]>
           <div class="flex items-start gap-3">
-            <button class="task-checkbox flex-shrink-0 h-5 w-5 rounded-full border-2 border-blue-400 dark:border-blue-500 mt-1"
-                    [class.bg-blue-500]="i === 2" 
+            <button class="task-checkbox flex-shrink-0 h-5 w-5 rounded-full border-2 border-accent dark:border-accent-light mt-1 flex items-center justify-center"
+                    [class.bg-accent]="i === 2" 
+                    [class.dark:bg-accent-light]="i === 2"
                     aria-label="Mark task as complete">
-              <i *ngIf="i === 2" class="bi bi-check text-white text-xs flex items-center justify-center h-full"></i>
+              <i *ngIf="i === 2" class="bi bi-check text-white text-xs"></i>
             </button>
             
             <div class="flex-grow">
-              <div class="flex justify-between items-start mb-1">
+              <div class="flex justify-between items-start mb-1.5">
                 <h3 class="font-medium" [class.line-through]="i === 2" 
                     [class.text-gray-500]="i === 2">Task {{i}}: Mobile UI Improvements</h3>
-                <span class="task-badge bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 text-xs px-2 py-0.5 rounded-full">
+                <span class="task-badge bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 text-xs px-2.5 py-0.5 rounded-full">
                   {{i === 1 ? 'Today' : i === 3 ? 'Tomorrow' : 'Next Week'}}
                 </span>
               </div>
@@ -104,21 +130,23 @@ import { trigger, transition, style, animate } from '@angular/animations';
               
               <div class="flex justify-between items-center">
                 <div class="priority-indicator flex items-center">
-                  <i class="bi bi-flag-fill priority-high mr-1" 
+                  <i class="bi bi-flag-fill priority-high mr-1.5" 
                      *ngIf="i === 1 || i === 4"></i>
-                  <i class="bi bi-flag-fill priority-medium mr-1" 
+                  <i class="bi bi-flag-fill priority-medium mr-1.5" 
                      *ngIf="i === 3"></i>
+                  <i class="bi bi-flag-fill priority-low mr-1.5" 
+                     *ngIf="i === 5"></i>
                   <span class="text-xs text-gray-600 dark:text-gray-300">
-                    {{i === 1 || i === 4 ? 'High' : i === 3 ? 'Medium' : ''}}
+                    {{i === 1 || i === 4 ? 'High' : i === 3 ? 'Medium' : i === 5 ? 'Low' : ''}}
                   </span>
                 </div>
                 
-                <div class="task-actions flex gap-1">
-                  <button class="p-1.5 rounded-full bg-gray-100 dark:bg-gray-700"
+                <div class="task-actions flex gap-1.5">
+                  <button class="p-1.5 rounded-full bg-gray-100 dark:bg-gray-700 active-state"
                           aria-label="Edit task">
                     <i class="bi bi-pencil text-xs text-gray-500 dark:text-gray-400"></i>
                   </button>
-                  <button class="p-1.5 rounded-full bg-gray-100 dark:bg-gray-700"
+                  <button class="p-1.5 rounded-full bg-gray-100 dark:bg-gray-700 active-state"
                           aria-label="Delete task">
                     <i class="bi bi-trash text-xs text-gray-500 dark:text-gray-400"></i>
                   </button>
@@ -129,30 +157,14 @@ import { trigger, transition, style, animate } from '@angular/animations';
         </div>
       </div>
 
-      <!-- Floating Action Button -->
-      <button class="fab" aria-label="Add new task">
+      <!-- Enhanced Floating Action Button -->
+      <button class="fab bg-gradient-to-br from-accent to-blue-500 dark:from-accent-light dark:to-blue-400 shadow-lg" 
+              aria-label="Add new task">
         <i class="bi bi-plus text-xl"></i>
       </button>
 
-      <!-- Bottom Navigation -->
-      <div class="mobile-bottom-nav">
-        <a href="#" class="mobile-nav-item active">
-          <i class="bi bi-list-check mobile-nav-icon"></i>
-          <span class="mobile-nav-text">Tasks</span>
-        </a>
-        <a href="#" class="mobile-nav-item">
-          <i class="bi bi-calendar-event mobile-nav-icon"></i>
-          <span class="mobile-nav-text">Calendar</span>
-        </a>
-        <a href="#" class="mobile-nav-item">
-          <i class="bi bi-bar-chart mobile-nav-icon"></i>
-          <span class="mobile-nav-text">Progress</span>
-        </a>
-        <a href="#" class="mobile-nav-item">
-          <i class="bi bi-gear mobile-nav-icon"></i>
-          <span class="mobile-nav-text">Settings</span>
-        </a>
-      </div>
+      <!-- Bottom padding for space -->
+      <div class="h-20"></div>
     </div>
   `,
   styles: [`
@@ -172,7 +184,7 @@ import { trigger, transition, style, animate } from '@angular/animations';
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 1rem;
+      padding: 1.25rem 1rem;
       background: rgba(255, 255, 255, 0.95);
       backdrop-filter: blur(10px);
       border-bottom: 1px solid rgba(229, 231, 235, 0.5);
@@ -187,7 +199,7 @@ import { trigger, transition, style, animate } from '@angular/animations';
       background-color: white;
       border: 1px solid rgba(229, 231, 235, 0.5);
       box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      transition: all 0.2s ease;
     }
 
     :host-context(.dark) .task-item {
@@ -200,31 +212,67 @@ import { trigger, transition, style, animate } from '@angular/animations';
     }
     
     .task-checkbox {
+      transition: all 0.2s ease;
+    }
+    
+    .fab {
+      position: fixed;
+      bottom: 80px;
+      right: 20px;
+      height: 56px;
+      width: 56px;
+      border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
+      color: white;
+      box-shadow: 0 4px 14px 0 rgba(0, 0, 0, 0.2);
+      transition: all 0.3s ease;
+      z-index: 40;
+    }
+    
+    .fab:active {
+      transform: scale(0.92);
+    }
+    
+    .nav-pill {
+      @apply px-4 py-2 rounded-full text-sm font-medium transition-all 
+             flex items-center focus:outline-none focus:ring-2 focus:ring-offset-2 
+             focus:ring-accent dark:focus:ring-accent-light;
+    }
+    
+    .nav-pill-active {
+      @apply bg-accent/15 text-accent dark:bg-accent-dark/25 dark:text-accent-light;
+    }
+    
+    .nav-pill-inactive {
+      @apply text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-800;
+    }
+    
+    .task-badge {
+      @apply inline-flex items-center;
     }
     
     .no-scrollbar {
-      -ms-overflow-style: none;
-      scrollbar-width: none;
+      -ms-overflow-style: none;  /* IE and Edge */
+      scrollbar-width: none;  /* Firefox */
     }
     
     .no-scrollbar::-webkit-scrollbar {
-      display: none;
+      display: none; /* Chrome, Safari and Opera */
     }
-
-    .mobile-bottom-nav a.active {
-      color: #3b82f6;
+    
+    .empty-state {
+      @apply flex items-center justify-center min-h-[60vh];
     }
-
-    :host-context(.dark) .mobile-bottom-nav a.active {
-      color: #60a5fa;
+    
+    .active-state:active {
+      transform: scale(0.95);
     }
   `]
 })
 export class MobileTodoListComponent implements OnInit {
   constructor() {}
-  
+
   ngOnInit(): void {}
 } 

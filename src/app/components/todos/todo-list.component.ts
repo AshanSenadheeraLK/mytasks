@@ -149,7 +149,9 @@ const version = '2.0.0';
                   <h1 class="text-2xl font-bold text-primary dark:text-blue-400 tracking-tight">MY TASKS</h1>
                   <div class="hidden sm:flex items-center space-x-2">
                     <span class="px-3 py-1 text-xs bg-blue-100 dark:bg-blue-900/30 text-primary dark:text-blue-300 rounded-full font-medium">
-                      v{{ getVersion() }}
+                      <a routerLink="/versions/{{ getVersion() }}" class="text-primary dark:text-blue-300">
+                      v{{ getVersion() }} <i class="bi bi-box-arrow-up-right text-sm"></i>
+                      </a>
                     </span>
                     <div class="h-5 w-px bg-gray-200 dark:bg-gray-700"></div>
                     <span class="text-sm text-gray-600 dark:text-gray-300">

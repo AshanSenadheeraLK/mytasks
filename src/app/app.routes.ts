@@ -39,5 +39,9 @@ export const routes: Routes = [
     loadComponent: () => import('./components/chat-interface/chat-interface.component').then(m => m.ChatInterfaceComponent),
     canActivate: [AuthGuard]
   },
+  {
+    path: 'versions',
+    loadChildren: () => import('./versions/versions.module').then(m => m.VersionsModule)
+  },
   { path: '**', redirectTo: '' }
 ];

@@ -3,13 +3,14 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { DeviceService, DeviceType } from '../../../services/device.service';
 import { Subscription, fromEvent } from 'rxjs';
 import { throttleTime } from 'rxjs/operators';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-footer',
   templateUrl: './footer.component.html',
   styleUrls: ['./footer.component.css'],
   standalone: true,
-  imports: [CommonModule]
+  imports: [CommonModule, RouterLink]
 })
 export class FooterComponent implements OnInit, OnDestroy {
   title = 'MY TASKS - Task Management System';
@@ -20,7 +21,7 @@ export class FooterComponent implements OnInit, OnDestroy {
   private deviceSubscription: Subscription | null = null;
   private scrollSubscription: Subscription | null = null;
 
-  version = '2.0.0 ~ Pre-Release Beta';
+  version = '2.0.0';
 
   socialLinks = [
     {
