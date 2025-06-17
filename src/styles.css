@@ -65,13 +65,13 @@
 
 /* Hero Section Styles */
 .mobile-hero, .tablet-hero {
-  background: linear-gradient(135deg, #1d4ed8, #3b82f6, #60a5fa);
+  background: linear-gradient(135deg, #8b5cf6, #ec4899, #f472b6);
   position: relative;
   overflow: hidden;
 }
 
 .hero-blob {
-  background: radial-gradient(circle at 70% 20%, rgba(96, 165, 250, 0.7), rgba(37, 99, 235, 0.2) 60%);
+  background: radial-gradient(circle at 70% 20%, rgba(236, 72, 153, 0.7), rgba(139, 92, 246, 0.2) 60%);
   animation: blob-float 20s ease-in-out infinite alternate;
 }
 
@@ -162,13 +162,13 @@
     --scrollbar-track: transparent;
     --scrollbar-thumb: #d1d5db;
     --transition-ease: all 0.2s ease;
-    --color-blue: #1d4ed8;
+    --color-blue: #8b5cf6;
     --color-black: #111827;
-    --color-green: #16a34a;
-    --color-yellow: #facc15;
+    --color-green: #22c55e;
+    --color-yellow: #eab308;
     --color-red: #ef4444;
-    --accent-color: var(--color-blue);
-    --accent-hover: #2563eb;
+    --accent-color: #ec4899;
+    --accent-hover: #db2777;
     --card-bg: #ffffff;
     --card-border: #e2e8f0;
     --text-primary: #1f2937;
@@ -177,13 +177,13 @@
 
   .dark {
     --scrollbar-thumb: #4b5563;
-    --color-blue: #3b82f6;
+    --color-blue: #c084fc;
     --color-black: #111827;
     --color-green: #22c55e;
     --color-yellow: #fbbf24;
     --color-red: #f87171;
-    --accent-color: var(--color-blue);
-    --accent-hover: #60a5fa;
+    --accent-color: #f472b6;
+    --accent-hover: #fb7185;
     --card-bg: #1e293b;
     --card-border: #334155;
     --text-primary: #f9fafb;

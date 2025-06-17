@@ -41,12 +41,12 @@ import { ThemeToggleComponent } from '../shared/theme-toggle.component';
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div>
               <h1 class="text-4xl md:text-5xl font-bold font-display text-gray-800 dark:text-white leading-tight mb-6">
-                Your Tasks, <br>
-                <span class="text-primary dark:text-primary-light">Organized & Simplified</span>
+                Streamline Your Workflow<br>
+                <span class="text-primary dark:text-primary-light">with MyTasks</span>
               </h1>
               <p class="text-lg md:text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-lg">
-                Boost your productivity with our intuitive task management platform. 
-                Stay organized, focused, and accomplish more every day.
+                Manage projects effortlessly with an interface crafted for clarity.
+                Focus on what matters and achieve more every single day.
               </p>
               <div class="flex flex-col sm:flex-row gap-4 mb-8">
                 <a routerLink="/register" class="btn btn-primary btn-lg">
