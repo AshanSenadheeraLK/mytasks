@@ -1,22 +1,137 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Conversation } from '../../services/chat-firestore.service';
 
 @Component({
   selector: 'app-chat-sidebar',
   standalone: true,
   imports: [CommonModule],
   template: `
-    <aside class="hidden lg:flex flex-col w-64 border-r border-gray-200 dark:border-gray-700 h-full bg-white dark:bg-gray-800">
-      <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 font-semibold">
-        Conversations
+    <aside 
+      *ngIf="isOpen" 
+      class="flex flex-col h-full border-r border-gray-200 dark:border-gray-700 
+             bg-card dark:bg-card-dark overflow-hidden transition-all duration-300"
+    >
+      <!-- Sidebar header -->
+      <div class="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+        <h2 class="font-semibold text-gray-800 dark:text-gray-200">Conversations</h2>
+        <button 
+          (click)="onNewConversation()" 
+          class="p-1.5 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 
+                 text-gray-600 dark:text-gray-300"
+          title="New Conversation"
+        >
+          <i class="bi bi-plus-lg"></i>
+        </button>
       </div>
-      <div class="flex-1 overflow-y-auto divide-y divide-gray-100 dark:divide-gray-700">
-        <div class="p-3 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer" *ngFor="let i of [1,2,3,4]">
-          Conversation {{i}}
+      
+      <!-- Conversations list -->
+      <div class="flex-1 overflow-y-auto divide-y divide-gray-100 dark:divide-gray-700 custom-scrollbar">
+        <ng-container *ngIf="conversations.length > 0">
+          <div 
+            *ngFor="let convo of conversations"
+            class="px-4 py-3 cursor-pointer transition-colors hover:bg-gray-50 dark:hover:bg-gray-800"
+            [ngClass]="{'bg-gray-100 dark:bg-gray-800': currentConversation?.id === convo.id}"
+            (click)="onSelectConversation(convo.id)"
+          >
+            <div class="flex items-center gap-2">
+              <div class="w-8 h-8 rounded-full flex items-center justify-center bg-primary/10 dark:bg-primary-light/10 text-primary dark:text-primary-light flex-shrink-0">
+                <i class="bi bi-chat-dots"></i>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between">
+                  <h3 class="text-sm font-medium truncate text-gray-800 dark:text-gray-200">
+                    {{ convo.title }}
+                  </h3>
+                  <span class="text-xs text-gray-500 dark:text-gray-400 ml-2">
+                    {{ formatTime(convo.updatedAt) }}
+                  </span>
+                </div>
+                <p *ngIf="convo.lastMessage" class="text-xs truncate text-gray-500 dark:text-gray-400 mt-1">
+                  {{ convo.lastMessage }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+        
+        <!-- Empty state -->
+        <div *ngIf="conversations.length === 0" class="flex flex-col items-center justify-center p-6 text-center h-full">
+          <div class="w-12 h-12 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-3">
+            <i class="bi bi-chat text-gray-500 dark:text-gray-400 text-xl"></i>
+          </div>
+          <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">No conversations yet</p>
+          <button 
+            (click)="onNewConversation()" 
+            class="px-3 py-1.5 text-sm bg-primary dark:bg-primary-light text-white dark:text-gray-900 rounded-lg hover:bg-primary-dark"
+          >
+            Start chatting
+          </button>
         </div>
+      </div>
+      
+      <!-- Info footer -->
+      <div class="p-3 border-t border-gray-200 dark:border-gray-700 text-xs text-gray-500 dark:text-gray-400 text-center">
+        Messages are automatically deleted after 12 hours
       </div>
     </aside>
   `,
-  styles: []
+  styles: [`
+    :host {
+      display: block;
+      height: 100%;
+    }
+  `]
 })
-export class ChatSidebarComponent {}
+export class ChatSidebarComponent {
+  @Input() isOpen = false;
+  @Input() conversations: Conversation[] = [];
+  @Input() currentConversation: Conversation | null = null;
+  
+  @Output() conversationSelected = new EventEmitter<string>();
+  @Output() newConversation = new EventEmitter<void>();
+  
+  onSelectConversation(id: string): void {
+    this.conversationSelected.emit(id);
+  }
+  
+  onNewConversation(): void {
+    this.newConversation.emit();
+  }
+  
+  formatTime(timestamp: any): string {
+    if (!timestamp) return '';
+    
+    try {
+      // Handle Firestore timestamp
+      const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+      
+      const now = new Date();
+      const diffInDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
+      
+      // Today
+      if (
+        date.getDate() === now.getDate() &&
+        date.getMonth() === now.getMonth() &&
+        date.getFullYear() === now.getFullYear()
+      ) {
+        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      }
+      
+      // Yesterday
+      if (diffInDays === 1) {
+        return 'Yesterday';
+      }
+      
+      // Within a week
+      if (diffInDays < 7) {
+        return date.toLocaleDateString([], { weekday: 'short' });
+      }
+      
+      // Older than a week
+      return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+    } catch (e) {
+      return '';
+    }
+  }
+}

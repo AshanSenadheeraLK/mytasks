@@ -64,6 +64,22 @@
       }
     })();
   </script>
+  
+  <!-- ✅ Service Worker Registration -->
+  <script>
+    // Register the service worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('/service-worker.js')
+          .then(function(registration) {
+            console.log('ServiceWorker registration successful with scope: ', registration.scope);
+          })
+          .catch(function(error) {
+            console.log('ServiceWorker registration failed: ', error);
+          });
+      });
+    }
+  </script>
 </head>
 
 <body class="bg-neutral-50 dark:bg-neutral-950 antialiased text-neutral-800 dark:text-neutral-200 font-sans">
