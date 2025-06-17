@@ -722,4 +722,53 @@ body.modal-open {
   overflow: hidden;
 }
 
+/* Disabled cursor when hovering disabled fields */
+/* Disabled state styles */
+button:disabled,
+input:disabled,
+select:disabled,
+textarea:disabled,
+.disabled {
+  @apply cursor-not-allowed opacity-60;
+}
+
+/* Search input styles */
+.search-input {
+  @apply block w-full pl-10 pr-12 py-2.5 rounded-lg bg-white dark:bg-gray-800 
+         text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600
+         focus:ring-2 focus:ring-primary dark:focus:ring-primary-light
+         focus:border-primary dark:focus:border-primary-light focus:outline-none
+         placeholder:text-gray-400 dark:placeholder:text-gray-500;
+}
+
+/* Filter badge styles */
+.filter-badge {
+  @apply px-3 py-1.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700
+         text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600
+         transition-colors duration-200 focus:outline-none focus:ring-2 
+         focus:ring-primary dark:focus:ring-primary-light;
+}
+
+.active-filter {
+  @apply bg-primary dark:bg-primary-light text-white dark:text-gray-900
+         hover:bg-primary-dark dark:hover:bg-primary;
+}
+
+/* Task item styles */
+.task-item {
+  @apply p-4 rounded-lg border border-gray-200 dark:border-gray-700 
+         bg-white dark:bg-gray-800 shadow-sm hover:shadow-md
+         transition-all duration-200;
+}
+
+.task-completed {
+  @apply line-through text-gray-500 dark:text-gray-400;
+}
+
+/* Custom checkbox styles */
+.checkbox-custom {
+  @apply h-5 w-5 rounded border-gray-300 dark:border-gray-600
+         text-primary dark:text-primary-light focus:ring-primary 
+         dark:focus:ring-primary-light transition-colors duration-200;
+}
 
