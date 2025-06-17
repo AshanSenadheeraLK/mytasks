@@ -8,21 +8,21 @@ module.exports = {
     extend: {
       colors: {
         primary: {
-          DEFAULT: '#1d4ed8', // Blue-700
-          light: '#3b82f6',   // Blue-500
-          dark: '#1e40af'     // Blue-800
+          DEFAULT: '#8b5cf6', // Violet-500
+          light: '#c084fc',   // Violet-300
+          dark: '#6d28d9'     // Violet-700
         },
         base: {
-          blue: '#1d4ed8',    // Blue-700
+          blue: '#8b5cf6',    // Violet-500
           black: '#111827',   // Gray-900
-          green: '#16a34a',   // Green-600
-          yellow: '#facc15',  // Yellow-400
+          green: '#22c55e',   // Green-500
+          yellow: '#eab308',  // Yellow-500
           red: '#ef4444'      // Red-500
         },
         accent: {
-          DEFAULT: '#3b82f6', // Blue-500
-          light: '#60a5fa',   // Blue-400
-          dark: '#1d4ed8'     // Blue-700
+          DEFAULT: '#ec4899', // Fuchsia-500
+          light: '#f472b6',   // Fuchsia-300
+          dark: '#be185d'     // Rose-700
         },
         background: {
           DEFAULT: '#f8fafc',           // Slate-50
@@ -56,8 +56,8 @@ module.exports = {
         }
       },
       fontFamily: {
-        'sans': ['Space Grotesk', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-        'display': ['Orbitron', 'Space Grotesk', 'ui-sans-serif', 'system-ui', 'sans-serif']
+        'sans': ['Jost', 'Space Grotesk', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        'display': ['Orbitron', 'Jost', 'ui-sans-serif', 'system-ui', 'sans-serif']
       },
       boxShadow: {
         'card': '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.02)',

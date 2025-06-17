@@ -44,13 +44,13 @@ import { DeviceService } from './services/device.service';
       display: block;
       width: 100%;
       height: 100%;
-      --primary: #4361ee;
-      --primary-dark: #3a56d4;
-      --primary-light: #4895ef;
-      --secondary: #560bad;
-      --accent: #f72585;
-      --success: #06d6a0;
-      --warning: #ffd166;
+      --primary: #8b5cf6;
+      --primary-dark: #6d28d9;
+      --primary-light: #c084fc;
+      --secondary: #9333ea;
+      --accent: #ec4899;
+      --success: #22c55e;
+      --warning: #eab308;
       --danger: #ef476f;
       --neutral-50: #f8fafc;
       --neutral-100: #f1f5f9;
@@ -64,20 +64,20 @@ import { DeviceService } from './services/device.service';
       --neutral-900: #0f172a;
       --neutral-950: #020617;
       
-      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: 'Jost', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
       color: var(--neutral-800);
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
     }
     
     ::ng-deep :root {
-      --primary: #4361ee;
-      --primary-dark: #3a56d4;
-      --primary-light: #4895ef;
-      --secondary: #560bad;
-      --accent: #f72585;
-      --success: #06d6a0;
-      --warning: #ffd166;
+      --primary: #8b5cf6;
+      --primary-dark: #6d28d9;
+      --primary-light: #c084fc;
+      --secondary: #9333ea;
+      --accent: #ec4899;
+      --success: #22c55e;
+      --warning: #eab308;
       --danger: #ef476f;
       --neutral-50: #f8fafc;
       --neutral-100: #f1f5f9;
@@ -98,7 +98,7 @@ import { DeviceService } from './services/device.service';
       margin: 0;
       padding: 0;
       line-height: 1.5;
-      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: 'Jost', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
     }
     
     ::ng-deep body.dark-mode {
