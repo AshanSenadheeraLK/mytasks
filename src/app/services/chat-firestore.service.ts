@@ -1,18 +1,20 @@
 import { Injectable, OnDestroy } from '@angular/core';
-import { 
-  Firestore, 
-  collection, 
-  addDoc, 
-  query, 
-  where, 
-  orderBy, 
-  onSnapshot, 
-  serverTimestamp, 
-  Timestamp, 
-  getDocs, 
+import {
+  Firestore,
+  collection,
+  addDoc,
+  query,
+  where,
+  orderBy,
+  onSnapshot,
+  serverTimestamp,
+  Timestamp,
+  getDocs,
   deleteDoc,
   limit,
-  DocumentData
+  DocumentData,
+  writeBatch,
+  updateDoc
 } from 'firebase/firestore';
 import { BehaviorSubject, Observable, Subscription, interval } from 'rxjs';
 import { AuthService } from './auth.service';
@@ -340,5 +342,3 @@ export class ChatFirestoreService implements OnDestroy {
   }
 }
 
-// Helper imports
-import { writeBatch, updateDoc } from 'firebase/firestore'; 
