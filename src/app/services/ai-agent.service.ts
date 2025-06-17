@@ -8,6 +8,7 @@ interface AiResponse {
         text?: string;
       }>;
     };
+    finishReason?: string;
   }>;
 }
 
@@ -18,20 +19,49 @@ export class AiAgentService {
 
   async sendPrompt(prompt: string): Promise<any> {
     if (!this.apiUrl || !this.apiKey) {
-      console.warn('AI API not configured');
-      return null;
+      console.error('AI API not configured. Check environment variables.');
+      return "I'm sorry, I'm not configured properly. Please contact support.";
     }
 
     if (!prompt || typeof prompt !== 'string') {
       console.error('Invalid prompt provided');
-      return null;
+      return "I couldn't process that message. Please try again.";
     }
 
     try {
       const url = `${this.apiUrl}?key=${this.apiKey}`;
       const body = {
-        contents: [{ parts: [{ text: prompt }] }]
+        contents: [{ 
+          parts: [{ text: prompt }] 
+        }],
+        generationConfig: {
+          temperature: 0.7,
+          topK: 40,
+          topP: 0.95,
+          maxOutputTokens: 1024
+        },
+        safetySettings: [
+          {
+            category: "HARM_CATEGORY_HARASSMENT",
+            threshold: "BLOCK_MEDIUM_AND_ABOVE"
+          },
+          {
+            category: "HARM_CATEGORY_HATE_SPEECH",
+            threshold: "BLOCK_MEDIUM_AND_ABOVE"
+          },
+          {
+            category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+            threshold: "BLOCK_MEDIUM_AND_ABOVE"
+          },
+          {
+            category: "HARM_CATEGORY_DANGEROUS_CONTENT",
+            threshold: "BLOCK_MEDIUM_AND_ABOVE"
+          }
+        ]
       };
+      
+      console.log('Sending request to AI API...', this.apiUrl);
+      
       const response = await fetch(url, {
         method: 'POST',
         headers: {
@@ -41,36 +71,35 @@ export class AiAgentService {
       });
 
       if (!response.ok) {
-        const errorText = await response.text();
-        console.error('AI request failed:', response.status, errorText);
-        return null;
+        const errorData = await response.json();
+        console.error('AI request failed:', response.status, errorData);
+        return `Sorry, I couldn't process your request (${errorData?.error?.message || `Error ${response.status}`}).`;
       }
 
       const data: AiResponse = await response.json();
-      const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      
+      if (!data.candidates || data.candidates.length === 0) {
+        console.warn('AI response did not contain any candidates');
+        return "I received an empty response. Please try again.";
+      }
+      
+      const text = data.candidates[0]?.content?.parts?.[0]?.text;
       
       if (!text) {
         console.warn('AI response did not contain expected text format');
-        return null;
+        return "I received a response but couldn't find any text. Please try again.";
       }
 
+      // First try to parse as JSON
       try {
         return JSON.parse(text);
       } catch (parseError) {
-        const match = text.match(/\{[\s\S]*\}/);
-        if (match) {
-          try {
-            return JSON.parse(match[0]);
-          } catch {
-            /* ignore */
-          }
-        }
-        console.warn('Failed to parse AI response as JSON, returning raw text:', parseError);
+        // If not valid JSON, just return the text response
         return text;
       }
     } catch (err) {
       console.error('AI request error:', err);
-      return null;
+      return "Sorry, there was an error processing your request. Please try again later.";
     }
   }
 }

@@ -1,11 +1,12 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Conversation } from '../../services/chat-firestore.service';
 
 @Component({
   selector: 'app-chat-sidebar',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   template: `
     <aside 
       *ngIf="isOpen" 
@@ -30,19 +31,32 @@ import { Conversation } from '../../services/chat-firestore.service';
         <ng-container *ngIf="conversations.length > 0">
           <div 
             *ngFor="let convo of conversations"
-            class="px-4 py-3 cursor-pointer transition-colors hover:bg-gray-50 dark:hover:bg-gray-800"
+            class="group px-4 py-3 cursor-pointer transition-colors hover:bg-gray-50 dark:hover:bg-gray-800"
             [ngClass]="{'bg-gray-100 dark:bg-gray-800': currentConversation?.id === convo.id}"
-            (click)="onSelectConversation(convo.id)"
           >
             <div class="flex items-center gap-2">
               <div class="w-8 h-8 rounded-full flex items-center justify-center bg-primary/10 dark:bg-primary-light/10 text-primary dark:text-primary-light flex-shrink-0">
                 <i class="bi bi-chat-dots"></i>
               </div>
-              <div class="flex-1 min-w-0">
+              <div class="flex-1 min-w-0" (click)="onSelectConversation(convo.id)">
                 <div class="flex items-center justify-between">
-                  <h3 class="text-sm font-medium truncate text-gray-800 dark:text-gray-200">
-                    {{ convo.title }}
-                  </h3>
+                  <ng-container *ngIf="editingConversation !== convo.id; else editTitle">
+                    <h3 class="text-sm font-medium truncate text-gray-800 dark:text-gray-200">
+                      {{ convo.title }}
+                    </h3>
+                  </ng-container>
+                  <ng-template #editTitle>
+                    <input
+                      #titleInput
+                      type="text"
+                      [(ngModel)]="editTitle"
+                      (keyup.enter)="saveTitle(convo.id)"
+                      (blur)="saveTitle(convo.id)"
+                      class="w-full text-sm bg-transparent border-b border-primary dark:border-primary-light 
+                             text-gray-800 dark:text-gray-200 focus:outline-none"
+                      (click)="$event.stopPropagation()"
+                    >
+                  </ng-template>
                   <span class="text-xs text-gray-500 dark:text-gray-400 ml-2">
                     {{ formatTime(convo.updatedAt) }}
                   </span>
@@ -50,6 +64,23 @@ import { Conversation } from '../../services/chat-firestore.service';
                 <p *ngIf="convo.lastMessage" class="text-xs truncate text-gray-500 dark:text-gray-400 mt-1">
                   {{ convo.lastMessage }}
                 </p>
+              </div>
+              <!-- Action buttons -->
+              <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <button 
+                  (click)="startEdit(convo)"
+                  class="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400"
+                  title="Rename conversation"
+                >
+                  <i class="bi bi-pencil text-sm"></i>
+                </button>
+                <button 
+                  (click)="onDeleteConversation(convo.id)"
+                  class="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400"
+                  title="Delete conversation"
+                >
+                  <i class="bi bi-trash text-sm"></i>
+                </button>
               </div>
             </div>
           </div>
@@ -90,6 +121,11 @@ export class ChatSidebarComponent {
   
   @Output() conversationSelected = new EventEmitter<string>();
   @Output() newConversation = new EventEmitter<void>();
+  @Output() deleteConversation = new EventEmitter<string>();
+  @Output() renameConversation = new EventEmitter<{id: string, title: string}>();
+  
+  editingConversation: string | null = null;
+  editTitle: string = '';
   
   onSelectConversation(id: string): void {
     this.conversationSelected.emit(id);
@@ -97,6 +133,32 @@ export class ChatSidebarComponent {
   
   onNewConversation(): void {
     this.newConversation.emit();
+  }
+  
+  onDeleteConversation(id: string): void {
+    if (confirm('Are you sure you want to delete this conversation? This action cannot be undone.')) {
+      this.deleteConversation.emit(id);
+    }
+  }
+  
+  startEdit(conversation: Conversation): void {
+    this.editingConversation = conversation.id;
+    this.editTitle = conversation.title;
+    setTimeout(() => {
+      const input = document.querySelector('input') as HTMLInputElement;
+      if (input) {
+        input.focus();
+        input.select();
+      }
+    });
+  }
+  
+  saveTitle(id: string): void {
+    if (this.editingConversation && this.editTitle.trim()) {
+      this.renameConversation.emit({id, title: this.editTitle.trim()});
+      this.editingConversation = null;
+      this.editTitle = '';
+    }
   }
   
   formatTime(timestamp: any): string {

@@ -244,15 +244,69 @@ export class ChatFirestoreService implements OnDestroy {
     await addDoc(collection(this.db, 'messages'), messageData);
     
     // Update conversation's lastMessage and updatedAt
-    const conversationsRef = collection(this.db, 'conversations');
-    const q = query(conversationsRef, where('id', '==', conversationId));
+    await this.updateConversation(conversationId, {
+      lastMessage: text.substring(0, 100),
+      updatedAt: serverTimestamp()
+    });
+  }
+
+  // Update conversation
+  private async updateConversation(conversationId: string, data: Partial<Conversation>): Promise<void> {
+    if (!this.currentUserId) throw new Error('User not authenticated');
+    
+    const conversationRef = collection(this.db, 'conversations');
+    const q = query(conversationRef, where('id', '==', conversationId));
     const querySnapshot = await getDocs(q);
     
     if (!querySnapshot.empty) {
-      await updateDoc(querySnapshot.docs[0].ref, {
-        lastMessage: text.substring(0, 50) + (text.length > 50 ? '...' : ''),
-        updatedAt: serverTimestamp()
-      });
+      const doc = querySnapshot.docs[0];
+      await updateDoc(doc.ref, data);
+    }
+  }
+
+  // Rename conversation
+  async renameConversation(conversationId: string, newTitle: string): Promise<void> {
+    if (!this.currentUserId) throw new Error('User not authenticated');
+    
+    await this.updateConversation(conversationId, {
+      title: newTitle,
+      updatedAt: serverTimestamp()
+    });
+  }
+
+  // Delete conversation and its messages
+  async deleteConversation(conversationId: string): Promise<void> {
+    if (!this.currentUserId) throw new Error('User not authenticated');
+    
+    const batch = writeBatch(this.db);
+    
+    // Delete all messages in the conversation
+    const messagesRef = collection(this.db, 'messages');
+    const messagesQuery = query(messagesRef, where('conversationId', '==', conversationId));
+    const messagesSnapshot = await getDocs(messagesQuery);
+    messagesSnapshot.forEach(doc => {
+      batch.delete(doc.ref);
+    });
+    
+    // Delete the conversation document
+    const conversationsRef = collection(this.db, 'conversations');
+    const conversationQuery = query(conversationsRef, where('id', '==', conversationId));
+    const conversationSnapshot = await getDocs(conversationQuery);
+    if (!conversationSnapshot.empty) {
+      batch.delete(conversationSnapshot.docs[0].ref);
+    }
+    
+    // Commit the batch
+    await batch.commit();
+    
+    // If this was the current conversation, select another one
+    if (this.currentConversationSubject.value?.id === conversationId) {
+      const conversations = this.conversationsSubject.value.filter(c => c.id !== conversationId);
+      if (conversations.length > 0) {
+        await this.setCurrentConversation(conversations[0].id);
+      } else {
+        this.currentConversationSubject.next(null);
+      }
     }
   }
 

@@ -38,6 +38,8 @@ import { AiAgentService } from '../../services/ai-agent.service';
           [currentConversation]="currentConversation"
           (conversationSelected)="selectConversation($event)"
           (newConversation)="createNewConversation()"
+          (deleteConversation)="deleteConversation($event)"
+          (renameConversation)="renameConversation($event)"
           class="transition-all duration-300 ease-in-out"
           [ngClass]="{'w-80': isSidebarOpen(), 'w-0': !isSidebarOpen()}"
         ></app-chat-sidebar>
@@ -135,16 +137,22 @@ export class ChatInterfaceComponent implements OnInit, OnDestroy {
     this.subscriptions.add(
       this.chatService.auth.user$.subscribe(user => {
         if (!user) {
-          setTimeout(() => {
+          // Only redirect if we're not already on the login page
+          if (!window.location.pathname.includes('/login')) {
             this.handleAuthError();
-          }, 500);
+          }
+        } else {
+          // User is authenticated, load their data
+          this.loadUserData();
         }
       })
     );
     
     // Check screen size to determine if sidebar should be open by default
     this.isSidebarOpen.set(window.innerWidth >= 1024);
-    
+  }
+
+  private loadUserData(): void {
     // Subscribe to messages
     this.subscriptions.add(
       this.chatService.messages$.subscribe(messages => {
@@ -189,13 +197,21 @@ export class ChatInterfaceComponent implements OnInit, OnDestroy {
         // Send user message to Firestore
         await this.chatService.sendMessage(message, 'user');
         
-        // Get AI response
-        const response = await this.ai.sendPrompt(message);
-        
-        // Send AI reply to Firestore
-        if (response) {
-          const aiMessage = typeof response === 'string' ? response : response.reply || 'Sorry, I could not process that.';
-          await this.chatService.sendMessage(aiMessage, 'assistant');
+        try {
+          // Get AI response
+          const response = await this.ai.sendPrompt(message);
+          
+          // Send AI reply to Firestore
+          if (response) {
+            const aiMessage = typeof response === 'string' ? response : response.reply || 'I processed your request but couldn\'t generate a proper response.';
+            await this.chatService.sendMessage(aiMessage, 'assistant');
+          } else {
+            // Handle null response
+            await this.chatService.sendMessage('Sorry, I experienced a technical issue. Please try again later.', 'assistant');
+          }
+        } catch (aiError) {
+          console.error('AI service error:', aiError);
+          await this.chatService.sendMessage('Sorry, I\'m having trouble connecting to my brain right now. Please try again in a moment.', 'assistant');
         }
       } catch (error) {
         console.error('Error sending message:', error);
@@ -208,7 +224,7 @@ export class ChatInterfaceComponent implements OnInit, OnDestroy {
           this.handleAuthError();
         } else {
           // Handle other errors
-          await this.chatService.sendMessage('Sorry, an error occurred while processing your message.', 'assistant')
+          await this.chatService.sendMessage('Sorry, an error occurred while processing your message. Please try again.', 'assistant')
             .catch(err => console.error('Failed to send error message:', err));
         }
       } finally {
@@ -247,6 +263,22 @@ export class ChatInterfaceComponent implements OnInit, OnDestroy {
 
   async createNewConversation(): Promise<void> {
     await this.chatService.createConversation('New Conversation');
+  }
+
+  async deleteConversation(id: string): Promise<void> {
+    try {
+      await this.chatService.deleteConversation(id);
+    } catch (error) {
+      console.error('Error deleting conversation:', error);
+    }
+  }
+
+  async renameConversation(event: {id: string, title: string}): Promise<void> {
+    try {
+      await this.chatService.renameConversation(event.id, event.title);
+    } catch (error) {
+      console.error('Error renaming conversation:', error);
+    }
   }
 
   trackByFn(index: number, item: ChatMessage): string {

@@ -2,29 +2,39 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Allow authenticated users to read and write messages and conversations
-    match /messages/{messageId} {
-      // Allow creating messages if authenticated and sender matches auth ID
-      allow create: if request.auth != null;
-      
-      // Allow reading messages that are part of conversations the user has access to
-      allow read: if request.auth != null;
-      
-      // Allow deleting your own messages
-      allow delete: if request.auth != null && 
-                     resource.data.sender == request.auth.uid;
+    // Helper function to check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
     }
     
+    // Helper function to check if the user owns the document
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // Messages collection rules
+    match /messages/{messageId} {
+      allow read: if isAuthenticated() &&
+        (resource.data.sender == request.auth.uid || 
+         get(/databases/$(database)/documents/conversations/$(resource.data.conversationId)).data.userId == request.auth.uid);
+      allow create: if isAuthenticated() &&
+        request.resource.data.sender == request.auth.uid;
+      allow delete: if isAuthenticated() &&
+        (resource.data.sender == request.auth.uid || 
+         get(/databases/$(database)/documents/conversations/$(resource.data.conversationId)).data.userId == request.auth.uid);
+    }
+    
+    // Conversations collection rules
     match /conversations/{conversationId} {
-      // Allow creating conversations
-      allow create: if request.auth != null;
-      
-      // Allow reading and updating conversations
-      allow read, update: if request.auth != null;
-      
-      // Allow deleting only if you are the conversation owner
-      allow delete: if request.auth != null && 
-                    resource.data.userId == request.auth.uid;
+      allow read, write: if isAuthenticated() && 
+        request.resource.data.userId == request.auth.uid;
+      allow read: if isAuthenticated() && 
+        resource.data.userId == request.auth.uid;
+    }
+    
+    // User profiles collection rules
+    match /users/{userId} {
+      allow read, write: if isOwner(userId);
     }
     
     // Allow users to read task data
