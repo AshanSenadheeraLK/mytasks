@@ -9,7 +9,7 @@ import { trigger, transition, style, animate } from '@angular/animations';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="fixed bottom-0 right-0 p-4 z-50 max-w-md w-full flex flex-col gap-3">
+    <div class="fixed bottom-0 right-0 p-4 z-[var(--z-popup)] max-w-md w-full flex flex-col gap-3">
       <div *ngFor="let alert of alerts; trackBy: trackByFn"
            [@toastAnimation]
            class="toast-notification flex items-center text-white p-5 rounded-lg shadow-lg border-l-4 transform transition-all"

@@ -138,7 +138,7 @@ const version = '2.0.0';
     <ng-template #desktopTemplate>
       <!-- Original desktop template content -->
       <!-- Fixed Top Navigation -->
-      <nav class="fixed top-0 left-0 right-0 bg-white dark:bg-gray-800 shadow-nav z-50 transition-colors duration-200">
+      <nav class="fixed top-0 left-0 right-0 bg-white dark:bg-gray-800 shadow-nav z-[var(--z-sticky)] transition-colors duration-200">
         <div class="max-w-7xl mx-auto">
           <!-- Desktop Navigation -->
           <div class="px-4 sm:px-6 lg:px-8">
@@ -584,6 +584,13 @@ const version = '2.0.0';
       <app-todo-edit-modal *ngIf="showModal" [todo]="selectedTodo" (save)="onModalSave($event)" (close)="closeModal()"></app-todo-edit-modal>
       <app-toast-notifications></app-toast-notifications>
     </ng-template>
+
+    <!-- Loading State -->
+    <ng-template #loadingState>
+      <div class="flex items-center justify-center h-screen">
+        <div class="animate-spin rounded-full h-24 w-24 border-t-2 border-blue-500"></div>
+      </div>
+    </ng-template>
   `,
   styles: []
 })
@@ -718,18 +725,26 @@ export class TodoListComponent implements OnInit, OnDestroy {
     }
 
     openAddModal() {
-      this.selectedTodo = null;
+      this.selectedTodo = { 
+        id: '', 
+        title: '', 
+        completed: false,
+        userId: this.authService.getCurrentUser()?.uid || '',
+        createdAt: new Date()
+      };
       this.showModal = true;
+      document.body.classList.add('modal-open');
     }
 
     openEditModal(todo: Todo) {
       this.selectedTodo = { ...todo };
       this.showModal = true;
+      document.body.classList.add('modal-open');
     }
 
     closeModal() {
       this.showModal = false;
-      this.selectedTodo = null;
+      document.body.classList.remove('modal-open');
     }
 
     async onModalSave(todoData: Partial<Todo>) {

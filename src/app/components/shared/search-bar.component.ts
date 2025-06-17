@@ -21,16 +21,14 @@ export interface SearchFilter {
       <!-- Search Input -->
       <div class="relative w-full">
         <div class="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none">
-          <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
+          <i class="bi bi-search text-gray-400 dark:text-gray-500 text-sm"></i>
         </div>
         <input 
           type="search"
           [(ngModel)]="searchTerm"
           (ngModelChange)="onSearchChange()"
           [placeholder]="placeholder"
-          class="w-full ps-10 pe-20 py-2.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white text-sm focus:ring-accent focus:border-accent"
+          class="search-input"
         />
         
         <!-- Right side buttons -->
@@ -39,71 +37,69 @@ export interface SearchFilter {
           <button 
             *ngIf="searchTerm && searchTerm.length > 0"
             (click)="clearSearch()"
-            class="p-1.5 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-1 focus:ring-accent"
+            class="p-1.5 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-1 focus:ring-primary"
             aria-label="Clear search"
           >
-            <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <i class="bi bi-x-lg text-sm"></i>
           </button>
           
           <!-- Filter button -->
           <button 
             (click)="toggleFilters()"
-            class="relative p-1.5 rounded-full hover:bg-gray-100 dark:hover:bg-gray-600 focus:outline-none focus:ring-1 focus:ring-accent transition-colors duration-200"
-            [class.text-accent]="showFilters || getActiveFiltersCount() > 0"
+            class="relative p-1.5 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-1 focus:ring-primary transition-colors duration-200"
+            [class.text-primary]="showFilters || getActiveFiltersCount() > 0"
+            [class.dark:text-primary-light]="showFilters || getActiveFiltersCount() > 0"
             [class.text-gray-400]="!showFilters && getActiveFiltersCount() === 0"
+            [class.dark:text-gray-500]="!showFilters && getActiveFiltersCount() === 0"
             aria-label="Toggle filters"
           >
-            <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-            </svg>
+            <i class="bi bi-funnel text-sm"></i>
             <!-- Active filters count badge -->
             <div *ngIf="getActiveFiltersCount() > 0" 
-                 class="absolute -top-1 -right-1 w-4 h-4 bg-accent text-white text-xs font-bold rounded-full flex items-center justify-center">
+                 class="absolute -top-1 -right-1 w-4 h-4 bg-primary dark:bg-primary-light text-white dark:text-gray-900 text-xs font-bold rounded-full flex items-center justify-center">
               {{ getActiveFiltersCount() }}
             </div>
           </button>
         </div>
       </div>
       
-      <!-- Filter Options -->
+      <!-- Filter Options Dropdown -->
       <div *ngIf="showFilters" 
-           class="animate-fade-in bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 shadow-lg p-4 space-y-4" style="margin-top: 200px;">
-        <!-- Close Filters Header -->
+           class="absolute right-0 top-full mt-2 w-full md:w-80 z-20 animate-scale-in bg-card dark:bg-card-dark rounded-lg border border-border dark:border-border-dark shadow-lg p-4 space-y-4">
+        <!-- Filters Header -->
         <div class="flex items-center justify-between mb-2">
-          <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">Filters</h3>
+          <h3 class="text-sm font-medium text-gray-800 dark:text-gray-200">Filter Tasks</h3>
           <button 
             (click)="closeFilters()" 
-            class="inline-flex items-center px-2 py-1 text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-accent"
+            class="p-1.5 rounded-full text-gray-400 dark:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none"
             aria-label="Close filters"
           >
-            <svg class="w-4 h-4 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-            Close
+            <i class="bi bi-x"></i>
           </button>
         </div>
 
         <!-- Task Status Filters -->
         <div class="space-y-2">
-          <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400">Task Status</h3>
+          <h3 class="text-xs font-medium text-gray-600 dark:text-gray-400">Task Status</h3>
           <div class="flex flex-wrap gap-1">
             <button
               (click)="setTaskStatusFilter('all')"
-              [class]="taskStatus === 'all' ? 'px-2 py-1 text-xs font-medium rounded-md bg-accent text-white' : 'px-2 py-1 text-xs font-medium rounded-md bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'"
+              class="filter-badge"
+              [class.active-filter]="taskStatus === 'all'"
             >
               All Tasks
             </button>
             <button
               (click)="setTaskStatusFilter('pending')"
-              [class]="taskStatus === 'pending' ? 'px-2 py-1 text-xs font-medium rounded-md bg-accent text-white' : 'px-2 py-1 text-xs font-medium rounded-md bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'"
+              class="filter-badge"
+              [class.active-filter]="taskStatus === 'pending'"
             >
               Pending
             </button>
             <button
               (click)="setTaskStatusFilter('completed')"
-              [class]="taskStatus === 'completed' ? 'px-2 py-1 text-xs font-medium rounded-md bg-accent text-white' : 'px-2 py-1 text-xs font-medium rounded-md bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'"
+              class="filter-badge"
+              [class.active-filter]="taskStatus === 'completed'"
             >
               Completed
             </button>
@@ -112,23 +108,26 @@ export interface SearchFilter {
 
         <!-- Search In Filters -->
         <div class="space-y-2">
-          <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400">Search In</h3>
+          <h3 class="text-xs font-medium text-gray-600 dark:text-gray-400">Search In</h3>
           <div class="flex flex-wrap gap-1">
             <button 
               (click)="setFilterType('all')" 
-              [class]="filterType === 'all' ? 'px-2 py-1 text-xs font-medium rounded-md bg-accent text-white' : 'px-2 py-1 text-xs font-medium rounded-md bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'"
+              class="filter-badge"
+              [class.active-filter]="filterType === 'all'"
             >
               All
             </button>
             <button 
               (click)="setFilterType('title')" 
-              [class]="filterType === 'title' ? 'px-2 py-1 text-xs font-medium rounded-md bg-accent text-white' : 'px-2 py-1 text-xs font-medium rounded-md bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'"
+              class="filter-badge"
+              [class.active-filter]="filterType === 'title'"
             >
               Title
             </button>
             <button 
               (click)="setFilterType('description')" 
-              [class]="filterType === 'description' ? 'px-2 py-1 text-xs font-medium rounded-md bg-accent text-white' : 'px-2 py-1 text-xs font-medium rounded-md bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'"
+              class="filter-badge"
+              [class.active-filter]="filterType === 'description'"
             >
               Description
             </button>
@@ -137,23 +136,26 @@ export interface SearchFilter {
         
         <!-- Priority Filters -->
         <div class="space-y-2">
-          <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400">Priority</h3>
+          <h3 class="text-xs font-medium text-gray-600 dark:text-gray-400">Priority</h3>
           <div class="flex flex-wrap gap-1">
             <button 
               (click)="setPriorityFilter('low')" 
-              [class]="filterType === 'priority' && priorityValue === 'low' ? 'px-2 py-1 text-xs font-medium rounded-md bg-green-500 text-white' : 'px-2 py-1 text-xs font-medium rounded-md bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-900/50'"
+              class="filter-badge bg-base-green/10 text-base-green dark:bg-base-green/20 dark:text-status-successDark"
+              [class.active-filter-green]="filterType === 'priority' && priorityValue === 'low'"
             >
               Low
             </button>
             <button 
               (click)="setPriorityFilter('medium')" 
-              [class]="filterType === 'priority' && priorityValue === 'medium' ? 'px-2 py-1 text-xs font-medium rounded-md bg-yellow-500 text-white' : 'px-2 py-1 text-xs font-medium rounded-md bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300 hover:bg-yellow-200 dark:hover:bg-yellow-900/50'"
+              class="filter-badge bg-base-yellow/10 text-base-yellow dark:bg-base-yellow/20 dark:text-status-warningDark"
+              [class.active-filter-yellow]="filterType === 'priority' && priorityValue === 'medium'"
             >
               Medium
             </button>
             <button 
               (click)="setPriorityFilter('high')" 
-              [class]="filterType === 'priority' && priorityValue === 'high' ? 'px-2 py-1 text-xs font-medium rounded-md bg-red-500 text-white' : 'px-2 py-1 text-xs font-medium rounded-md bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-900/50'"
+              class="filter-badge bg-base-red/10 text-base-red dark:bg-base-red/20 dark:text-status-errorDark"
+              [class.active-filter-red]="filterType === 'priority' && priorityValue === 'high'"
             >
               High
             </button>
@@ -162,10 +164,11 @@ export interface SearchFilter {
         
         <!-- Overdue Filter -->
         <div class="space-y-2">
-          <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400">Due Date</h3>
+          <h3 class="text-xs font-medium text-gray-600 dark:text-gray-400">Due Date</h3>
           <button
             (click)="setFilterType('overdue')"
-            [class]="filterType === 'overdue' ? 'px-2 py-1 text-xs font-medium rounded-md bg-purple-500 text-white' : 'px-2 py-1 text-xs font-medium rounded-md bg-purple-100 text-purple-800 hover:bg-purple-200'"
+            class="filter-badge bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400"
+            [class.active-filter-purple]="filterType === 'overdue'"
           >
             Overdue
           </button>
@@ -173,25 +176,80 @@ export interface SearchFilter {
 
         <!-- Tag Filter -->
         <div class="space-y-2">
-          <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400">Tag</h3>
-          <input type="text" [(ngModel)]="tag" (ngModelChange)="emitCurrentFilter()" class="w-full p-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300" placeholder="work" />
+          <h3 class="text-xs font-medium text-gray-600 dark:text-gray-400">Tag</h3>
+          <input 
+            type="text" 
+            [(ngModel)]="tag" 
+            (ngModelChange)="emitCurrentFilter()" 
+            class="w-full px-3 py-2 text-sm border border-border dark:border-border-dark rounded-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:ring-primary dark:focus:ring-primary-light focus:border-primary dark:focus:border-primary-light transition-colors" 
+            placeholder="Enter tag..." />
+        </div>
+        
+        <!-- Reset Filters Button -->
+        <div class="pt-2 border-t border-border dark:border-border-dark">
+          <button 
+            (click)="resetFilters()"
+            class="w-full py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary-light flex items-center justify-center"
+          >
+            <i class="bi bi-arrow-clockwise mr-1.5"></i>
+            Reset Filters
+          </button>
         </div>
       </div>
     </div>
   `,
   styles: [`
-    .animate-fade-in {
-      animation: fadeIn 0.2s ease-in-out;
+    .search-input {
+      @apply w-full ps-10 pe-16 py-2.5 
+             bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm 
+             border border-gray-200 dark:border-gray-700 rounded-lg 
+             text-gray-900 dark:text-white text-sm 
+             focus:ring-2 focus:ring-primary/30 dark:focus:ring-primary-light/30
+             focus:border-primary dark:focus:border-primary-light
+             transition-colors duration-200;
     }
     
-    @keyframes fadeIn {
-      from {
+    .filter-badge {
+      @apply px-2 py-1 text-xs font-medium rounded-md
+             bg-gray-100 dark:bg-gray-800 
+             text-gray-700 dark:text-gray-300
+             hover:bg-gray-200 dark:hover:bg-gray-700
+             transition-colors duration-200;
+    }
+    
+    .active-filter {
+      @apply bg-primary text-white dark:bg-primary-light dark:text-gray-900;
+    }
+    
+    .active-filter-green {
+      @apply bg-base-green text-white dark:bg-status-successDark dark:text-gray-900;
+    }
+    
+    .active-filter-yellow {
+      @apply bg-base-yellow text-gray-900 dark:bg-status-warningDark dark:text-gray-900;
+    }
+    
+    .active-filter-red {
+      @apply bg-base-red text-white dark:bg-status-errorDark dark:text-gray-900;
+    }
+    
+    .active-filter-purple {
+      @apply bg-purple-600 text-white dark:bg-purple-500 dark:text-white;
+    }
+    
+    .animate-scale-in {
+      animation: scaleIn 0.2s ease-out forwards;
+      transform-origin: top right;
+    }
+    
+    @keyframes scaleIn {
+      0% {
         opacity: 0;
-        transform: translateY(-10px);
+        transform: scale(0.95);
       }
-      to {
+      100% {
         opacity: 1;
-        transform: translateY(0);
+        transform: scale(1);
       }
     }
   `]
@@ -245,9 +303,8 @@ export class SearchBarComponent implements OnInit, OnDestroy {
       this.filterType = type;
     }
     
-    // Reset priority value when changing to a non-priority filter type.
-    // Since 'priority' is handled by setPriorityFilter, and this function
-    // sets other filter types, it's always correct to clear priorityValue here.
+    // Reset priority value when changing to a non-priority filter type
+    // since we're setting it to another type
     this.priorityValue = undefined;
     
     this.emitCurrentFilter();
@@ -255,7 +312,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
 
   setPriorityFilter(priority: 'low' | 'medium' | 'high'): void {
     if (this.filterType === 'priority' && this.priorityValue === priority) {
-      // Reset if clicking the same priority
+      // Reset to 'all' if clicking the same priority
       this.filterType = 'all';
       this.priorityValue = undefined;
     } else {
@@ -267,31 +324,36 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   }
 
   setTaskStatusFilter(statusToSet: 'all' | 'pending' | 'completed'): void {
-    if (this.taskStatus === statusToSet && statusToSet !== 'all') {
-      // If clicking an active non-'all' status filter, reset to 'all'
+    if (this.taskStatus === statusToSet) {
+      // Reset to 'all' if clicking the same status
       this.taskStatus = 'all';
     } else {
       this.taskStatus = statusToSet;
     }
+    
     this.emitCurrentFilter();
   }
 
   clearSearch(): void {
     this.searchTerm = '';
+    this.emitCurrentFilter();
+  }
+  
+  resetFilters(): void {
     this.filterType = 'all';
     this.priorityValue = undefined;
     this.taskStatus = 'all';
     this.tag = '';
     this.emitCurrentFilter();
   }
-  
+
   public emitCurrentFilter(): void {
     this.searchSubject.next({
       term: this.searchTerm,
       filterType: this.filterType,
       priorityValue: this.priorityValue,
       taskStatus: this.taskStatus,
-      tag: this.tag
+      tag: this.tag || undefined
     });
   }
 
@@ -301,9 +363,8 @@ export class SearchBarComponent implements OnInit, OnDestroy {
 
   getActiveFiltersCount(): number {
     let count = 0;
-    if (this.taskStatus !== 'all') count++;
     if (this.filterType !== 'all') count++;
-    if (this.priorityValue) count++;
+    if (this.taskStatus !== 'all') count++;
     if (this.tag) count++;
     return count;
   }

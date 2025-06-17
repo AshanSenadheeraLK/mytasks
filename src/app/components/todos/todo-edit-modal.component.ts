@@ -9,16 +9,13 @@ import { Todo } from '../../services/todo.service';
   imports: [CommonModule, FormsModule],
   template: `
     <div 
-      class="fixed inset-0 bg-black/70 backdrop-blur-md z-50 transition-opacity duration-300 flex items-center justify-center overflow-auto px-4 py-8"
-      [class.animate-fade-in]="true"
+      class="modal-overlay animate-fade-in"
       (click)="onClose()"
       role="dialog"
       aria-labelledby="modalTitle"
       aria-modal="true">
       <div 
-        class="bg-white dark:bg-gray-800 max-w-md w-full mx-auto transform transition-all duration-300 animate-slide-up shadow-2xl rounded-3xl overflow-hidden mobile-device:max-h-[95vh] mobile-device:overflow-y-auto"
-        [class.scale-100]="true" 
-        [class.opacity-100]="true"
+        class="modal-content animate-slide-up mobile-device:max-h-[95vh] mobile-device:overflow-y-auto"
         (click)="$event.stopPropagation()">
         
         <!-- Decorative top bar with accent color -->
