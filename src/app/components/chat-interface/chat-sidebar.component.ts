@@ -65,22 +65,17 @@ import { Conversation } from '../../services/chat-firestore.service';
                   {{ convo.lastMessage }}
                 </p>
               </div>
-              <!-- Action buttons -->
+              <!-- Action buttons generated via loop -->
               <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                <button 
-                  (click)="startEdit(convo)"
-                  class="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400"
-                  title="Rename conversation"
-                >
-                  <i class="bi bi-pencil text-sm"></i>
-                </button>
-                <button 
-                  (click)="onDeleteConversation(convo.id)"
-                  class="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400"
-                  title="Delete conversation"
-                >
-                  <i class="bi bi-trash text-sm"></i>
-                </button>
+                <ng-container *ngFor="let action of actionButtons">
+                  <button
+                    (click)="action.action(convo)"
+                    class="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400"
+                    [title]="action.title"
+                  >
+                    <i class="bi text-sm" [ngClass]="action.icon"></i>
+                  </button>
+                </ng-container>
               </div>
             </div>
           </div>
@@ -126,6 +121,20 @@ export class ChatSidebarComponent {
   
   editingConversation: string | null = null;
   editTitle: string = '';
+
+  // Actions used for generating buttons via a loop
+  actionButtons = [
+    {
+      icon: 'bi-pencil',
+      title: 'Rename conversation',
+      action: (c: Conversation) => this.startEdit(c)
+    },
+    {
+      icon: 'bi-trash',
+      title: 'Delete conversation',
+      action: (c: Conversation) => this.onDeleteConversation(c.id)
+    }
+  ];
   
   onSelectConversation(id: string): void {
     this.conversationSelected.emit(id);

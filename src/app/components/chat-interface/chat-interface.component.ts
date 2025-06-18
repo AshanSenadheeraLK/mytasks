@@ -133,20 +133,22 @@ export class ChatInterfaceComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    // Check if user is authenticated
-    this.subscriptions.add(
-      this.chatService.auth.user$.subscribe(user => {
-        if (!user) {
-          // Only redirect if we're not already on the login page
-          if (!window.location.pathname.includes('/login')) {
-            this.handleAuthError();
+    // Wait for auth initialization before checking user state
+    this.chatService.auth.authReady.then(() => {
+      this.subscriptions.add(
+        this.chatService.auth.user$.subscribe(user => {
+          if (!user) {
+            // Only redirect if we're not already on the login page
+            if (!window.location.pathname.includes('/login')) {
+              this.handleAuthError();
+            }
+          } else {
+            // User is authenticated, load their data
+            this.loadUserData();
           }
-        } else {
-          // User is authenticated, load their data
-          this.loadUserData();
-        }
-      })
-    );
+        })
+      );
+    });
     
     // Check screen size to determine if sidebar should be open by default
     this.isSidebarOpen.set(window.innerWidth >= 1024);
