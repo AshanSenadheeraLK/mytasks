@@ -57,7 +57,7 @@ import { AuthService } from '../../../services/auth.service';
             <a routerLink="/app/chat" routerLinkActive="bg-primary/10 text-primary dark:bg-primary-light/10 dark:text-primary-light font-medium"
               class="flex items-center gap-3 px-4 py-3 rounded-xl text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors group">
               <i class="bi bi-chat-text text-lg group-hover:text-primary dark:group-hover:text-primary-light"></i>
-              <span>AI Assistant</span>
+              <span>Assistant</span>
             </a>
           </div>
 

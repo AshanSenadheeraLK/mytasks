@@ -8,7 +8,5 @@ export const environment = {
     messagingSenderId: process.env['FIREBASE_MESSAGING_SENDER_ID'] || "456710557347",
     appId: process.env['FIREBASE_APP_ID'] || "1:456710557347:web:d2a069bcbe4a1fb9ab3916",
     measurementId: process.env['FIREBASE_MEASUREMENT_ID'] || "G-MLK1HF1MTG"
-  },
-  aiApiUrl: process.env['AI_API_URL'] || 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent',
-  aiApiKey: process.env['AI_API_KEY'] || 'AIzaSyDDs2eltkKFeVtm6MUwW4gaXjeXlEEsEQI'
+  }
 };

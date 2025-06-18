@@ -60,7 +60,7 @@ import { AiAgentService } from '../../services/ai-agent.service';
             </div>
             <h3 class="text-xl font-medium text-gray-800 dark:text-gray-200 mb-2">Start a conversation</h3>
             <p class="text-gray-600 dark:text-gray-400 max-w-md mb-6">
-              Chat with your AI assistant to help you manage tasks, answer questions, or just have a conversation!
+              Chat with the assistant to help you manage tasks, answer questions, or just have a conversation!
             </p>
             <p class="text-xs text-gray-500 dark:text-gray-500">
               Messages are stored for 12 hours and then automatically deleted
@@ -200,14 +200,14 @@ export class ChatInterfaceComponent implements OnInit, OnDestroy {
         await this.chatService.sendMessage(message, 'user');
         
         try {
-          // Restrict AI to task management topics only
+          // Restrict the assistant to task management topics only
           const systemPrompt =
             'You are a task management assistant for the MyTasks web app. ' +
             'Only help with creating, reading, updating, deleting, organising or categorising tasks. ' +
             'Politely refuse requests that are not related to task management.';
           const response = await this.ai.sendPrompt(`${systemPrompt}\nUser: ${message}`);
           
-          // Send AI reply to Firestore
+          // Send assistant reply to Firestore
           if (response) {
             const aiMessage = typeof response === 'string' ? response : response.reply || 'I processed your request but couldn\'t generate a proper response.';
             await this.chatService.sendMessage(aiMessage, 'assistant');
@@ -216,7 +216,7 @@ export class ChatInterfaceComponent implements OnInit, OnDestroy {
             await this.chatService.sendMessage('Sorry, I experienced a technical issue. Please try again later.', 'assistant');
           }
         } catch (aiError) {
-          console.error('AI service error:', aiError);
+          console.error('Assistant service error:', aiError);
           await this.chatService.sendMessage('Sorry, I\'m having trouble connecting to my brain right now. Please try again in a moment.', 'assistant');
         }
       } catch (error) {

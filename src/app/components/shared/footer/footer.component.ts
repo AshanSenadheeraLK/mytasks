@@ -14,7 +14,7 @@ import { RouterLink } from '@angular/router';
 })
 export class FooterComponent implements OnInit, OnDestroy {
   title = 'MY TASKS - Task Management System';
-  description = 'Organize, track, and accomplish your daily tasks with our intuitive and AI-powered task manager. Never miss a deadline again!';
+  description = 'Organize, track, and accomplish your daily tasks with our intuitive task manager. Never miss a deadline again!';
   
   currentYear = new Date().getFullYear();
   currentDevice: DeviceType = 'desktop';

@@ -83,12 +83,12 @@ import { ThemeToggleComponent } from '../theme-toggle.component';
             <!-- Empty space for FAB button -->
             <div class="w-16"></div>
             
-            <!-- AI Assistant button -->
-            <a routerLink="/app/chat" 
-              routerLinkActive="active-nav-item" 
+            <!-- Assistant button -->
+            <a routerLink="/app/chat"
+              routerLinkActive="active-nav-item"
               class="mobile-nav-item">
               <i class="bi bi-chat-text mobile-nav-icon"></i>
-              <span class="mobile-nav-text">AI</span>
+              <span class="mobile-nav-text">Chat</span>
             </a>
           </div>
         </div>
