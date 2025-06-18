@@ -9,5 +9,5 @@ export const environment = {
     appId: process.env['FIREBASE_APP_ID'] || "1:456710557347:web:d2a069bcbe4a1fb9ab3916",
     measurementId: process.env['FIREBASE_MEASUREMENT_ID'] || "G-MLK1HF1MTG"
   },
-  geminiApiKey: process.env['GEMINI_API_KEY'] || "sk-33bd1b357d514a3d8134cc17ab602b70"
+  geminiApiKey: process.env['GEMINI_API_KEY'] || "AIzaSyDDs2eltkKFeVtm6MUwW4gaXjeXlEEsEQI"
 };

@@ -29,5 +29,6 @@ export class AiChatService {
     };
     const url = `${this.endpoint}?key=${this.apiKey}`;
     return this.http.post<any>(url, body, { headers });
+
   }
 }
