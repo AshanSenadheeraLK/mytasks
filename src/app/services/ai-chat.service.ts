@@ -12,17 +12,23 @@ export interface ChatMessage {
   providedIn: 'root'
 })
 export class AiChatService {
-  private endpoint = 'https://api.deepseek.com/chat/completions';
-  private apiKey = environment.deepSeekApiKey;
+  private endpoint = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
+  private apiKey = environment.geminiApiKey;
 
   constructor(private http: HttpClient) {}
 
   send(messages: ChatMessage[]): Observable<any> {
     const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${this.apiKey}`
+      'Content-Type': 'application/json'
     });
-    const body = { model: 'deepseek-chat', messages };
-    return this.http.post<any>(this.endpoint, body, { headers });
+    const body = {
+      contents: messages.map(m => ({
+        role: m.role === 'assistant' ? 'model' : 'user',
+        parts: [{ text: m.content }]
+      }))
+    };
+    const url = `${this.endpoint}?key=${this.apiKey}`;
+    return this.http.post<any>(url, body, { headers });
+
   }
 }
