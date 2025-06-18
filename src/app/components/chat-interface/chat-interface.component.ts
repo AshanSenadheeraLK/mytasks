@@ -198,8 +198,12 @@ export class ChatInterfaceComponent implements OnInit, OnDestroy {
         await this.chatService.sendMessage(message, 'user');
         
         try {
-          // Get AI response
-          const response = await this.ai.sendPrompt(message);
+          // Restrict AI to task management topics only
+          const systemPrompt =
+            'You are a task management assistant for the MyTasks web app. ' +
+            'Only help with creating, reading, updating, deleting, organising or categorising tasks. ' +
+            'Politely refuse requests that are not related to task management.';
+          const response = await this.ai.sendPrompt(`${systemPrompt}\nUser: ${message}`);
           
           // Send AI reply to Firestore
           if (response) {
