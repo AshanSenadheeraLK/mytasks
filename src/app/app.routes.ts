@@ -24,13 +24,18 @@ export const routes: Routes = [
     component: TodoListComponent,
     canActivate: [AuthGuard]
   },
-  { 
-    path: 'app', 
+  {
+    path: 'app',
     component: TodoListComponent,
     canActivate: [AuthGuard]
   },
-  { 
-    path: 'profile', 
+  {
+    path: 'app/aiassistant',
+    loadComponent: () => import('./components/aiassistant/ai-assistant.component').then(m => m.AiAssistantComponent),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'profile',
     loadComponent: () => import('./components/profile/profile.component').then(m => m.ProfileComponent),
     canActivate: [AuthGuard]
   },
