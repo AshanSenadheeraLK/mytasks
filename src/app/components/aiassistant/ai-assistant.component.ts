@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AiChatService, ChatMessage } from '../../services/ai-chat.service';
 import { NetworkService } from '../../services/network.service';
-import { TodoService, Todo } from '../../services/todo.service';
+import { TodoService, Todo, SubTask } from '../../services/todo.service';
 import { AuthService } from '../../services/auth.service';
 import { Subject, Subscription, Observable, of } from 'rxjs';
 import { debounceTime, distinctUntilChanged, finalize, takeUntil, take, map, catchError } from 'rxjs/operators';
@@ -272,14 +272,20 @@ export class AiAssistantComponent implements OnInit, OnDestroy, AfterViewInit {
     { text: "Show me my incomplete tasks", icon: "M9 5H7a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2V9a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" },
     { text: "What are my high priority tasks?", icon: "M13 10V3L4 14h7v7l9-11h-7z" },
     { text: "Create a new task", icon: "M12 6v6m0 0v6m0-6h6m-6 0H6" },
-    { text: "What's due this week?", icon: "M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" }
+    { text: "What's due this week?", icon: "M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" },
+    { text: "Mark all tasks as complete", icon: "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" },
+    { text: "Delete all completed tasks", icon: "M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" },
+    { text: "Set all tasks due next Monday", icon: "M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" }
   ];
   
   quickActions = [
     "Show all tasks",
     "Add task",
     "Priority tasks",
-    "Due today"
+    "Due today",
+    "Mark all complete",
+    "Delete completed",
+    "Due next Monday"
   ];
   
   private inputSubject = new Subject<string>();
@@ -368,7 +374,10 @@ export class AiAssistantComponent implements OnInit, OnDestroy, AfterViewInit {
       'Show all tasks': 'Show me all my tasks',
       'Add task': 'Help me create a new task',
       'Priority tasks': 'What are my high priority tasks?',
-      'Due today': 'What tasks are due today?'
+      'Due today': 'What tasks are due today?',
+      'Mark all complete': 'Mark all tasks as complete',
+      'Delete completed': 'Delete all completed tasks',
+      'Due next Monday': 'Set all tasks due next Monday'
     };
     
     this.input = actionMap[action] || action;
@@ -565,159 +574,532 @@ export class AiAssistantComponent implements OnInit, OnDestroy, AfterViewInit {
     let taskActionPerformed = false;
     let actionFeedback = '';
     
-    // Create new task
-    if (/create|add|new task/i.test(userQuery.toLowerCase())) {
-      const titleMatch = userQuery.match(/(?:create|add|new task|task to) (.*?)(?:with|by|due|$)/i);
-      if (titleMatch && titleMatch[1]) {
-        const title = titleMatch[1].trim();
-        let priority: 'low' | 'medium' | 'high' = 'medium';
-        if (/high priority/i.test(userQuery)) priority = 'high';
-        if (/low priority/i.test(userQuery)) priority = 'low';
+    // Check for bulk operations first
+    if (/all|every|all of|each|multiple tasks/i.test(userQuery.toLowerCase())) {
+      // Bulk mark complete/incomplete
+      if (/mark|set|complete|finish|done|incomplete|undone/i.test(userQuery.toLowerCase())) {
+        const shouldComplete = /complete|finish|done/i.test(userQuery) && 
+                             !(/incomplete|not complete|undone/i.test(userQuery));
         
-        let dueDate: Date | undefined = undefined;
-        if (/due (tomorrow|today|next week)/i.test(userQuery)) {
-          const date = new Date();
-          if (/tomorrow/i.test(userQuery)) {
-            date.setDate(date.getDate() + 1);
-          } else if (/next week/i.test(userQuery)) {
-            date.setDate(date.getDate() + 7);
-          }
-          dueDate = date;
-        }
+        const updateData: {id: string, data: Partial<Omit<Todo, 'id' | 'userId' | 'createdAt'>>}[] = [];
+        const affectedTasks: string[] = [];
         
-        this.todoService.addTodo(title, '', dueDate, priority)
-          .then(() => {
-            taskActionPerformed = true;
-            actionFeedback = `✅ Task "${title}" has been created.`;
-            this.addSystemFeedbackMessage(actionFeedback);
-          })
-          .catch(err => {
-            console.error('Error creating task:', err);
-            this.addSystemFeedbackMessage(`❌ Failed to create task: ${err.message}`);
-          });
-      }
-    }
-    
-    // Mark task as complete/incomplete
-    if (/mark|set|complete|finish|done|incomplete|undone/i.test(userQuery.toLowerCase())) {
-      // Look for task title in quotes or between markers
-      const taskMatch = userQuery.match(/["']([^"']+)["']|task\s+["']?([^"']+?)["']?(?:\s+as|\s+to|\s+status)/i);
-      if (taskMatch) {
-        const taskTitle = (taskMatch[1] || taskMatch[2]).trim();
-        const matchingTask = this.todos.find(t => 
-          t.title.toLowerCase() === taskTitle.toLowerCase() || 
-          t.title.toLowerCase().includes(taskTitle.toLowerCase())
-        );
-        
-        if (matchingTask && matchingTask.id) {
-          const shouldComplete = /complete|finish|done/i.test(userQuery) && 
-                               !(/incomplete|not complete|undone/i.test(userQuery));
+        this.todos.forEach(todo => {
+          // Skip tasks that are already in the desired state
+          if (todo.completed === shouldComplete) return;
           
-          this.todoService.updateTodo(matchingTask.id, { completed: shouldComplete })
+          if (todo.id) {
+            updateData.push({
+              id: todo.id,
+              data: { completed: shouldComplete }
+            });
+            affectedTasks.push(todo.title);
+          }
+        });
+        
+        if (updateData.length > 0) {
+          this.todoService.updateMultipleTodos(updateData)
             .then(() => {
               taskActionPerformed = true;
-              actionFeedback = `✅ Task "${matchingTask.title}" marked as ${shouldComplete ? 'complete' : 'incomplete'}.`;
+              const taskCount = affectedTasks.length;
+              actionFeedback = `✅ ${taskCount} tasks marked as ${shouldComplete ? 'complete' : 'incomplete'}.`;
               this.addSystemFeedbackMessage(actionFeedback);
             })
             .catch(err => {
-              console.error('Error updating task completion status:', err);
-              this.addSystemFeedbackMessage(`❌ Failed to update task: ${err.message}`);
+              console.error('Error updating multiple tasks:', err);
+              this.addSystemFeedbackMessage(`❌ Failed to update tasks: ${err.message}`);
             });
         }
-      }
-    }
-    
-    // Delete/remove task
-    if (/delete|remove|eliminate|trash/i.test(userQuery.toLowerCase())) {
-      const taskMatch = userQuery.match(/["']([^"']+)["']|task\s+["']?([^"']+?)["']?(?:\s+from|\s+list|\s*$)/i);
-      if (taskMatch) {
-        const taskTitle = (taskMatch[1] || taskMatch[2]).trim();
-        const matchingTask = this.todos.find(t => 
-          t.title.toLowerCase() === taskTitle.toLowerCase() || 
-          t.title.toLowerCase().includes(taskTitle.toLowerCase())
-        );
         
-        if (matchingTask && matchingTask.id) {
-          this.todoService.deleteTodo(matchingTask.id)
+        return; // Exit early after handling bulk operation
+      }
+      
+      // Bulk delete
+      if (/delete|remove|eliminate|trash/i.test(userQuery.toLowerCase())) {
+        // Check for specific condition like "all completed tasks"
+        const deleteCompleted = /completed|finished|done/i.test(userQuery.toLowerCase());
+        
+        const idsToDelete: string[] = [];
+        const affectedTasks: string[] = [];
+        
+        this.todos.forEach(todo => {
+          // If we're only deleting completed tasks, skip incomplete ones
+          if (deleteCompleted && !todo.completed) return;
+          
+          if (todo.id) {
+            idsToDelete.push(todo.id);
+            affectedTasks.push(todo.title);
+          }
+        });
+        
+        if (idsToDelete.length > 0) {
+          this.todoService.deleteMultipleTodos(idsToDelete)
             .then(() => {
               taskActionPerformed = true;
-              actionFeedback = `✅ Task "${matchingTask.title}" has been deleted.`;
+              const taskCount = affectedTasks.length;
+              actionFeedback = `✅ ${taskCount} tasks have been deleted.`;
               this.addSystemFeedbackMessage(actionFeedback);
             })
             .catch(err => {
-              console.error('Error deleting task:', err);
-              this.addSystemFeedbackMessage(`❌ Failed to delete task: ${err.message}`);
+              console.error('Error deleting multiple tasks:', err);
+              this.addSystemFeedbackMessage(`❌ Failed to delete tasks: ${err.message}`);
             });
         }
+        
+        return; // Exit early after handling bulk operation
       }
-    }
-    
-    // Update task priority
-    if (/change|update|set|modify|priority/i.test(userQuery.toLowerCase())) {
-      const taskMatch = userQuery.match(/["']([^"']+)["']|task\s+["']?([^"']+?)["']?(?:\s+to|\s+priority|\s+as)/i);
-      const priorityMatch = /\b(high|medium|low)\b\s+priority|\bpriority\s+\b(high|medium|low)\b/i.exec(userQuery);
       
-      if (taskMatch && priorityMatch) {
-        const taskTitle = (taskMatch[1] || taskMatch[2]).trim();
-        const priority = (priorityMatch[1] || priorityMatch[2]).toLowerCase() as 'high' | 'medium' | 'low';
+      // Bulk update priority
+      if (/change|update|set|modify|priority/i.test(userQuery.toLowerCase())) {
+        const priorityMatch = /\b(high|medium|low)\b\s+priority|\bpriority\s+\b(high|medium|low)\b/i.exec(userQuery);
         
-        const matchingTask = this.todos.find(t => 
-          t.title.toLowerCase() === taskTitle.toLowerCase() || 
-          t.title.toLowerCase().includes(taskTitle.toLowerCase())
-        );
-        
-        if (matchingTask && matchingTask.id) {
-          this.todoService.updateTodo(matchingTask.id, { priority })
-            .then(() => {
-              taskActionPerformed = true;
-              actionFeedback = `✅ Task "${matchingTask.title}" priority updated to ${priority}.`;
-              this.addSystemFeedbackMessage(actionFeedback);
-            })
-            .catch(err => {
-              console.error('Error updating task priority:', err);
-              this.addSystemFeedbackMessage(`❌ Failed to update task priority: ${err.message}`);
-            });
+        if (priorityMatch) {
+          const priority = (priorityMatch[1] || priorityMatch[2]).toLowerCase() as 'high' | 'medium' | 'low';
+          
+          const updateData: {id: string, data: Partial<Omit<Todo, 'id' | 'userId' | 'createdAt'>>}[] = [];
+          const affectedTasks: string[] = [];
+          
+          this.todos.forEach(todo => {
+            // Skip tasks that already have this priority
+            if (todo.priority === priority) return;
+            
+            if (todo.id) {
+              updateData.push({
+                id: todo.id,
+                data: { priority }
+              });
+              affectedTasks.push(todo.title);
+            }
+          });
+          
+          if (updateData.length > 0) {
+            this.todoService.updateMultipleTodos(updateData)
+              .then(() => {
+                taskActionPerformed = true;
+                const taskCount = affectedTasks.length;
+                actionFeedback = `✅ ${taskCount} tasks updated to ${priority} priority.`;
+                this.addSystemFeedbackMessage(actionFeedback);
+              })
+              .catch(err => {
+                console.error('Error updating priority for multiple tasks:', err);
+                this.addSystemFeedbackMessage(`❌ Failed to update task priorities: ${err.message}`);
+              });
+          }
+          
+          return; // Exit early after handling bulk operation
         }
       }
-    }
-    
-    // Update task due date
-    if (/due date|deadline|reschedule/i.test(userQuery.toLowerCase())) {
-      const taskMatch = userQuery.match(/["']([^"']+)["']|task\s+["']?([^"']+?)["']?(?:\s+to|\s+due|\s+for)/i);
-      let dueDate: Date | undefined = undefined;
-      let dueDateText = '';
       
-      if (/tomorrow/i.test(userQuery)) {
-        dueDate = new Date();
-        dueDate.setDate(dueDate.getDate() + 1);
-        dueDateText = 'tomorrow';
-      } else if (/next week/i.test(userQuery)) {
-        dueDate = new Date();
-        dueDate.setDate(dueDate.getDate() + 7);
-        dueDateText = 'next week';
-      } else if (/today/i.test(userQuery)) {
-        dueDate = new Date();
-        dueDateText = 'today';
+      // Bulk update due date
+      if (/due date|deadline|reschedule/i.test(userQuery.toLowerCase())) {
+        let dueDate: Date | undefined = undefined;
+        let dueDateText = '';
+        
+        // Enhanced date parsing
+        if (/tomorrow/i.test(userQuery)) {
+          dueDate = new Date();
+          dueDate.setDate(dueDate.getDate() + 1);
+          dueDateText = 'tomorrow';
+        } else if (/next week/i.test(userQuery)) {
+          dueDate = new Date();
+          dueDate.setDate(dueDate.getDate() + 7);
+          dueDateText = 'next week';
+        } else if (/today/i.test(userQuery)) {
+          dueDate = new Date();
+          dueDateText = 'today';
+        } else if (/next month/i.test(userQuery)) {
+          dueDate = new Date();
+          dueDate.setMonth(dueDate.getMonth() + 1);
+          dueDateText = 'next month';
+        } else if (/next friday|this friday/i.test(userQuery)) {
+          dueDate = this.getNextDayOfWeek(5); // Friday is 5 (0 is Sunday)
+          dueDateText = 'Friday';
+        } else if (/next monday|this monday/i.test(userQuery)) {
+          dueDate = this.getNextDayOfWeek(1); // Monday is 1
+          dueDateText = 'Monday';
+        } else if (/(\d{1,2})(?:st|nd|rd|th)? of (?:january|february|march|april|may|june|july|august|september|october|november|december)/i.test(userQuery)) {
+          // Match patterns like "15th of December" or "3rd of March"
+          const dateMatch = userQuery.match(/(\d{1,2})(?:st|nd|rd|th)? of (january|february|march|april|may|june|july|august|september|october|november|december)/i);
+          if (dateMatch) {
+            const day = parseInt(dateMatch[1], 10);
+            const monthName = dateMatch[2].toLowerCase();
+            const monthIndex = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'].indexOf(monthName);
+            
+            if (monthIndex !== -1 && day >= 1 && day <= 31) {
+              const now = new Date();
+              let year = now.getFullYear();
+              
+              // If the month is before current month, assume next year
+              if (monthIndex < now.getMonth()) {
+                year++;
+              }
+              
+              dueDate = new Date(year, monthIndex, day);
+              dueDateText = `${day} ${monthName.charAt(0).toUpperCase() + monthName.slice(1)}`;
+            }
+          }
+        } else if (/in (\d+) days?/i.test(userQuery)) {
+          // Match patterns like "in 5 days" or "in 1 day"
+          const daysMatch = userQuery.match(/in (\d+) days?/i);
+          if (daysMatch) {
+            const days = parseInt(daysMatch[1], 10);
+            dueDate = new Date();
+            dueDate.setDate(dueDate.getDate() + days);
+            dueDateText = `in ${days} day${days === 1 ? '' : 's'}`;
+          }
+        }
+        
+        if (dueDate) {
+          const updateData: {id: string, data: Partial<Omit<Todo, 'id' | 'userId' | 'createdAt'>>}[] = [];
+          const affectedTasks: string[] = [];
+          
+          // Check for incomplete only condition
+          const incompleteOnly = /incomplete|not done|not completed|unfinished/i.test(userQuery);
+          
+          this.todos.forEach(todo => {
+            // Skip completed tasks if we're only updating incomplete ones
+            if (incompleteOnly && todo.completed) return;
+            
+            if (todo.id) {
+              updateData.push({
+                id: todo.id,
+                data: { dueDate }
+              });
+              affectedTasks.push(todo.title);
+            }
+          });
+          
+          if (updateData.length > 0) {
+            this.todoService.updateMultipleTodos(updateData)
+              .then(() => {
+                taskActionPerformed = true;
+                const taskCount = affectedTasks.length;
+                actionFeedback = `✅ ${taskCount} tasks due date set to ${dueDateText}.`;
+                this.addSystemFeedbackMessage(actionFeedback);
+              })
+              .catch(err => {
+                console.error('Error updating due dates for multiple tasks:', err);
+                this.addSystemFeedbackMessage(`❌ Failed to update due dates: ${err.message}`);
+              });
+          }
+          
+          return; // Exit early after handling bulk operation
+        }
       }
       
-      if (taskMatch && dueDate) {
-        const taskTitle = (taskMatch[1] || taskMatch[2]).trim();
-        const matchingTask = this.todos.find(t => 
-          t.title.toLowerCase() === taskTitle.toLowerCase() || 
-          t.title.toLowerCase().includes(taskTitle.toLowerCase())
-        );
+      // Add tags to tasks
+      if (/add tags?|apply tags?|set tags?/i.test(userQuery.toLowerCase())) {
+        const tagsMatch = userQuery.match(/tags?\s+["']?([^"']+)["']?(?:\s+to|\s+for|\s+on)/i);
+        const taskMatch = userQuery.match(/(?:to|for|on)\s+(?:all|every|tasks?|todo)/i);
         
-        if (matchingTask && matchingTask.id) {
-          this.todoService.updateTodo(matchingTask.id, { dueDate })
+        if (tagsMatch && taskMatch) {
+          const tags = tagsMatch[1].split(/,|\s+/).map(tag => tag.trim().toLowerCase()).filter(tag => tag.length > 0);
+          
+          if (tags.length > 0) {
+            const promises: Promise<void>[] = [];
+            const affectedTasks: string[] = [];
+            
+            this.todos.forEach(todo => {
+              if (todo.id) {
+                promises.push(
+                  this.todoService.addTags(todo.id, tags)
+                    .then(() => {
+                      affectedTasks.push(todo.title);
+                    })
+                );
+              }
+            });
+            
+            if (promises.length > 0) {
+              Promise.all(promises)
+                .then(() => {
+                  taskActionPerformed = true;
+                  actionFeedback = `✅ Added tags [${tags.join(', ')}] to ${affectedTasks.length} tasks.`;
+                  this.addSystemFeedbackMessage(actionFeedback);
+                })
+                .catch(err => {
+                  console.error('Error adding tags to tasks:', err);
+                  this.addSystemFeedbackMessage(`❌ Failed to add tags: ${err.message}`);
+                });
+            }
+            
+            return; // Exit early after handling bulk operation
+          }
+        }
+      }
+      
+      // Add tags to a specific task
+      if (/add tags?|apply tags?|set tags?/i.test(userQuery.toLowerCase())) {
+        const tagsMatch = userQuery.match(/tags?\s+["']?([^"']+)["']?(?:\s+to|\s+for|\s+on)/i);
+        const taskMatch = userQuery.match(/(?:to|for|on)\s+["']([^"']+)["']|(?:to|for|on)\s+task\s+["']?([^"']+?)["']?(?:\s|$)/i);
+        
+        if (tagsMatch && taskMatch) {
+          const tags = tagsMatch[1].split(/,|\s+/).map(tag => tag.trim().toLowerCase()).filter(tag => tag.length > 0);
+          const taskTitle = (taskMatch[1] || taskMatch[2]).trim();
+          
+          if (tags.length > 0) {
+            const matchingTask = this.todos.find(t => 
+              t.title.toLowerCase() === taskTitle.toLowerCase() || 
+              t.title.toLowerCase().includes(taskTitle.toLowerCase())
+            );
+            
+            if (matchingTask && matchingTask.id) {
+              this.todoService.addTags(matchingTask.id, tags)
+                .then(() => {
+                  taskActionPerformed = true;
+                  actionFeedback = `✅ Added tags [${tags.join(', ')}] to task "${matchingTask.title}".`;
+                  this.addSystemFeedbackMessage(actionFeedback);
+                })
+                .catch(err => {
+                  console.error('Error adding tags to task:', err);
+                  this.addSystemFeedbackMessage(`❌ Failed to add tags: ${err.message}`);
+                });
+            }
+          }
+          
+          return; // Exit early after handling operation
+        }
+      }
+      
+      // Remove tags from tasks
+      if (/remove tags?|delete tags?|clear tags?/i.test(userQuery.toLowerCase())) {
+        const tagsMatch = userQuery.match(/tags?\s+["']?([^"']+)["']?(?:\s+from|\s+in|\s+on)/i);
+        const taskMatch = userQuery.match(/(?:from|in|on)\s+(?:all|every|tasks?|todo)/i);
+        
+        if (tagsMatch && taskMatch) {
+          const tags = tagsMatch[1].split(/,|\s+/).map(tag => tag.trim().toLowerCase()).filter(tag => tag.length > 0);
+          
+          if (tags.length > 0) {
+            const promises: Promise<void>[] = [];
+            const affectedTasks: string[] = [];
+            
+            this.todos.forEach(todo => {
+              if (todo.id) {
+                promises.push(
+                  this.todoService.removeTags(todo.id, tags)
+                    .then(() => {
+                      affectedTasks.push(todo.title);
+                    })
+                );
+              }
+            });
+            
+            if (promises.length > 0) {
+              Promise.all(promises)
+                .then(() => {
+                  taskActionPerformed = true;
+                  actionFeedback = `✅ Removed tags [${tags.join(', ')}] from ${affectedTasks.length} tasks.`;
+                  this.addSystemFeedbackMessage(actionFeedback);
+                })
+                .catch(err => {
+                  console.error('Error removing tags from tasks:', err);
+                  this.addSystemFeedbackMessage(`❌ Failed to remove tags: ${err.message}`);
+                });
+            }
+            
+            return; // Exit early after handling bulk operation
+          }
+        }
+      }
+      
+      // Add subtask to a task
+      if (/add subtask|create subtask|new subtask/i.test(userQuery.toLowerCase())) {
+        const subtaskMatch = userQuery.match(/subtask\s+["']?([^"']+)["']?(?:\s+to|\s+for|\s+on)/i);
+        const taskMatch = userQuery.match(/(?:to|for|on)\s+["']([^"']+)["']|(?:to|for|on)\s+task\s+["']?([^"']+?)["']?(?:\s|$)/i);
+        
+        if (subtaskMatch && taskMatch) {
+          const subtaskTitle = subtaskMatch[1].trim();
+          const taskTitle = (taskMatch[1] || taskMatch[2]).trim();
+          
+          const matchingTask = this.todos.find(t => 
+            t.title.toLowerCase() === taskTitle.toLowerCase() || 
+            t.title.toLowerCase().includes(taskTitle.toLowerCase())
+          );
+          
+          if (matchingTask && matchingTask.id) {
+            const subtask: SubTask = {
+              id: Date.now().toString(), // Generate a simple unique ID
+              title: subtaskTitle,
+              completed: false
+            };
+            
+            this.todoService.addOrUpdateSubtask(matchingTask.id, subtask)
+              .then(() => {
+                taskActionPerformed = true;
+                actionFeedback = `✅ Added subtask "${subtaskTitle}" to task "${matchingTask.title}".`;
+                this.addSystemFeedbackMessage(actionFeedback);
+              })
+              .catch(err => {
+                console.error('Error adding subtask:', err);
+                this.addSystemFeedbackMessage(`❌ Failed to add subtask: ${err.message}`);
+              });
+              
+            return; // Exit early after handling operation
+          }
+        }
+      }
+      
+      // Complete/mark subtask as done
+      if (/complete subtask|mark subtask|finish subtask|done subtask/i.test(userQuery.toLowerCase())) {
+        const subtaskMatch = userQuery.match(/subtask\s+["']?([^"']+)["']?(?:\s+in|\s+of|\s+from)/i);
+        const taskMatch = userQuery.match(/(?:in|of|from)\s+["']([^"']+)["']|(?:in|of|from)\s+task\s+["']?([^"']+?)["']?(?:\s|$)/i);
+        
+        if (subtaskMatch && taskMatch) {
+          const subtaskTitle = subtaskMatch[1].trim();
+          const taskTitle = (taskMatch[1] || taskMatch[2]).trim();
+          
+          const matchingTask = this.todos.find(t => 
+            t.title.toLowerCase() === taskTitle.toLowerCase() || 
+            t.title.toLowerCase().includes(taskTitle.toLowerCase())
+          );
+          
+          if (matchingTask && matchingTask.id && matchingTask.subtasks) {
+            const matchingSubtask = matchingTask.subtasks.find(s => 
+              s.title.toLowerCase() === subtaskTitle.toLowerCase() || 
+              s.title.toLowerCase().includes(subtaskTitle.toLowerCase())
+            );
+            
+            if (matchingSubtask) {
+              // Toggle the completion status
+              const updatedSubtask: SubTask = {
+                ...matchingSubtask,
+                completed: !matchingSubtask.completed
+              };
+              
+              this.todoService.addOrUpdateSubtask(matchingTask.id, updatedSubtask)
+                .then(() => {
+                  taskActionPerformed = true;
+                  const status = updatedSubtask.completed ? 'completed' : 'incomplete';
+                  actionFeedback = `✅ Marked subtask "${subtaskTitle}" as ${status}.`;
+                  this.addSystemFeedbackMessage(actionFeedback);
+                })
+                .catch(err => {
+                  console.error('Error updating subtask:', err);
+                  this.addSystemFeedbackMessage(`❌ Failed to update subtask: ${err.message}`);
+                });
+                
+              return; // Exit early after handling operation
+            }
+          }
+        }
+      }
+      
+      // Remove subtask
+      if (/remove subtask|delete subtask/i.test(userQuery.toLowerCase())) {
+        const subtaskMatch = userQuery.match(/subtask\s+["']?([^"']+)["']?(?:\s+from|\s+in|\s+of)/i);
+        const taskMatch = userQuery.match(/(?:from|in|of)\s+["']([^"']+)["']|(?:from|in|of)\s+task\s+["']?([^"']+?)["']?(?:\s|$)/i);
+        
+        if (subtaskMatch && taskMatch) {
+          const subtaskTitle = subtaskMatch[1].trim();
+          const taskTitle = (taskMatch[1] || taskMatch[2]).trim();
+          
+          const matchingTask = this.todos.find(t => 
+            t.title.toLowerCase() === taskTitle.toLowerCase() || 
+            t.title.toLowerCase().includes(taskTitle.toLowerCase())
+          );
+          
+          if (matchingTask && matchingTask.id && matchingTask.subtasks) {
+            const matchingSubtask = matchingTask.subtasks.find(s => 
+              s.title.toLowerCase() === subtaskTitle.toLowerCase() || 
+              s.title.toLowerCase().includes(subtaskTitle.toLowerCase())
+            );
+            
+            if (matchingSubtask) {
+              this.todoService.removeSubtask(matchingTask.id, matchingSubtask.id)
+                .then(() => {
+                  taskActionPerformed = true;
+                  actionFeedback = `✅ Removed subtask "${subtaskTitle}" from task "${matchingTask.title}".`;
+                  this.addSystemFeedbackMessage(actionFeedback);
+                })
+                .catch(err => {
+                  console.error('Error removing subtask:', err);
+                  this.addSystemFeedbackMessage(`❌ Failed to remove subtask: ${err.message}`);
+                });
+                
+              return; // Exit early after handling operation
+            }
+          }
+        }
+      }
+      
+      // Bulk create tasks
+      if (/create|add|new tasks/i.test(userQuery.toLowerCase())) {
+        // Look for multiple tasks in various formats
+        let taskTitles: string[] = [];
+        
+        // Format 1: "create tasks: task1, task2, task3"
+        const tasksColonMatch = userQuery.match(/(?:create|add|new) tasks:?\s*(.+?)(?:with|by|due|$)/i);
+        if (tasksColonMatch && tasksColonMatch[1]) {
+          taskTitles = tasksColonMatch[1].split(/,|\n/).map(title => title.trim()).filter(title => title.length > 0);
+        }
+        
+        // Format 2: "create the following tasks: task1, task2, task3"
+        const followingTasksMatch = userQuery.match(/(?:create|add|new) (?:the )?following tasks:?\s*(.+?)(?:with|by|due|$)/i);
+        if (followingTasksMatch && followingTasksMatch[1]) {
+          taskTitles = followingTasksMatch[1].split(/,|\n/).map(title => title.trim()).filter(title => title.length > 0);
+        }
+        
+        // Format 3: Numbered or bulleted list
+        // Look for patterns like "1. Task one", "2. Task two" or "- Task one", "* Task two"
+        const listItemRegex = /(?:^|\n)(?:\d+\.|\*|\-)\s*([^\n]+)/g;
+        let listMatch;
+        const listItems: string[] = [];
+        while ((listMatch = listItemRegex.exec(userQuery)) !== null) {
+          if (listMatch[1] && listMatch[1].trim().length > 0) {
+            listItems.push(listMatch[1].trim());
+          }
+        }
+        
+        if (listItems.length > 0) {
+          taskTitles = listItems;
+        }
+        
+        if (taskTitles.length > 0) {
+          let priority: 'low' | 'medium' | 'high' = 'medium';
+          if (/high priority/i.test(userQuery)) priority = 'high';
+          if (/low priority/i.test(userQuery)) priority = 'low';
+          
+          let dueDate: Date | undefined = undefined;
+          if (/due (tomorrow|today|next week)/i.test(userQuery)) {
+            const date = new Date();
+            if (/tomorrow/i.test(userQuery)) {
+              date.setDate(date.getDate() + 1);
+            } else if (/next week/i.test(userQuery)) {
+              date.setDate(date.getDate() + 7);
+            }
+            dueDate = date;
+          } else if (/next month/i.test(userQuery)) {
+            dueDate = new Date();
+            dueDate.setMonth(dueDate.getMonth() + 1);
+          } else if (/next friday|this friday/i.test(userQuery)) {
+            dueDate = this.getNextDayOfWeek(5); // Friday is 5 (0 is Sunday)
+          } else if (/next monday|this monday/i.test(userQuery)) {
+            dueDate = this.getNextDayOfWeek(1); // Monday is 1
+          }
+          
+          // Create array of todos for batch creation
+          const todosToCreate = taskTitles.map(title => {
+            return {
+              title,
+              description: '',
+              completed: false,
+              priority,
+              dueDate
+            };
+          });
+          
+          this.todoService.addMultipleTodos(todosToCreate)
             .then(() => {
               taskActionPerformed = true;
-              actionFeedback = `✅ Task "${matchingTask.title}" due date set to ${dueDateText}.`;
+              actionFeedback = `✅ Created ${taskTitles.length} new tasks.`;
               this.addSystemFeedbackMessage(actionFeedback);
             })
             .catch(err => {
-              console.error('Error updating task due date:', err);
-              this.addSystemFeedbackMessage(`❌ Failed to update due date: ${err.message}`);
+              console.error('Error creating multiple tasks:', err);
+              this.addSystemFeedbackMessage(`❌ Failed to create tasks: ${err.message}`);
             });
+          
+          return; // Exit early after handling bulk operation
         }
       }
     }
@@ -759,5 +1141,12 @@ export class AiAssistantComponent implements OnInit, OnDestroy, AfterViewInit {
     this.input = '';
     this.storeMessages();
     this.cdr.markForCheck();
+  }
+  
+  // Helper method to get the next occurrence of a specific day of week
+  private getNextDayOfWeek(dayOfWeek: number): Date {
+    const result = new Date();
+    result.setDate(result.getDate() + (dayOfWeek + 7 - result.getDay()) % 7);
+    return result;
   }
 }

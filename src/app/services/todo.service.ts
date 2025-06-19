@@ -15,11 +15,23 @@ import {
   Timestamp,
   Unsubscribe,
   Firestore,
-  getFirestore
+  getFirestore,
+  writeBatch,
+  orderBy,
+  limit,
+  getDoc,
+  DocumentReference,
+  DocumentSnapshot,
+  WhereFilterOp,
+  QueryConstraint,
+  startAfter,
+  endBefore,
+  QueryDocumentSnapshot,
+  runTransaction
 } from 'firebase/firestore';
 import { AuthService } from './auth.service';
-import { BehaviorSubject, Observable, Subject, Subscription } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { BehaviorSubject, Observable, Subject, Subscription, from, throwError } from 'rxjs';
+import { takeUntil, map, catchError } from 'rxjs/operators';
 import { isPlatformBrowser } from '@angular/common';
 import { initializeApp } from 'firebase/app';
 import { environment } from '../../environments/environment';
@@ -34,6 +46,31 @@ export interface Todo {
   dueDate?: Timestamp | Date;
   priority?: 'low' | 'medium' | 'high';
   isEditing?: boolean;
+  tags?: string[];
+  category?: string;
+  attachments?: string[];
+  subtasks?: SubTask[];
+  lastModified?: Timestamp | Date;
+}
+
+export interface SubTask {
+  id: string;
+  title: string;
+  completed: boolean;
+}
+
+export interface TaskQuery {
+  field: string;
+  operator: WhereFilterOp;
+  value: any;
+}
+
+export interface TaskQueryOptions {
+  orderByField?: string;
+  orderDirection?: 'asc' | 'desc';
+  limit?: number;
+  startAfter?: DocumentSnapshot<DocumentData>;
+  endBefore?: DocumentSnapshot<DocumentData>;
 }
 
 @Injectable({
@@ -46,6 +83,7 @@ export class TodoService implements OnDestroy {
   private unsubscribe?: Unsubscribe;
   private authSubscription?: Subscription;
   private destroy$ = new Subject<void>();
+  private lastQuerySnapshot?: QueryDocumentSnapshot<DocumentData>;
 
   constructor(
     private authService: AuthService,
@@ -112,23 +150,23 @@ export class TodoService implements OnDestroy {
 
     try {
       const todosRef = collection(this.db, 'todos');
-      const q = query(todosRef, where('userId', '==', userId));
+      const q = query(
+        todosRef, 
+        where('userId', '==', userId),
+        orderBy('createdAt', 'desc')
+      );
       
       this.unsubscribe = onSnapshot(q, (querySnapshot: QuerySnapshot<DocumentData>) => {
         const todos = querySnapshot.docs.map(doc => {
           const data = doc.data();
-          return {
-            id: doc.id,
-            title: data['title'],
-            description: data['description'],
-            completed: data['completed'] || false,
-            userId: data['userId'],
-            createdAt: data['createdAt'],
-            dueDate: data['dueDate'],
-            priority: data['priority'] || 'medium'
-          } as Todo;
+          return this.convertFirestoreDocToTodo(doc);
         });
         this.todosSubject.next(todos);
+        
+        // Save the last document for pagination
+        if (querySnapshot.docs.length > 0) {
+          this.lastQuerySnapshot = querySnapshot.docs[querySnapshot.docs.length - 1];
+        }
       }, (error) => {
         console.error('Error listening to todos:', error);
         this.todosSubject.next([]); 
@@ -138,20 +176,48 @@ export class TodoService implements OnDestroy {
       this.todosSubject.next([]);
     }
   }
+  
+  private convertFirestoreDocToTodo(doc: QueryDocumentSnapshot<DocumentData>): Todo {
+    const data = doc.data();
+    return {
+      id: doc.id,
+      title: data['title'] || '',
+      description: data['description'] || '',
+      completed: data['completed'] || false,
+      userId: data['userId'] || '',
+      createdAt: data['createdAt'] || new Date(),
+      dueDate: data['dueDate'],
+      priority: data['priority'] || 'medium',
+      tags: data['tags'] || [],
+      category: data['category'] || '',
+      attachments: data['attachments'] || [],
+      subtasks: data['subtasks'] || [],
+      lastModified: data['lastModified'] || data['createdAt'] || new Date()
+    } as Todo;
+  }
 
-  async addTodo(title: string, description?: string, dueDate?: Date, priority: 'low' | 'medium' | 'high' = 'medium'): Promise<void> {
-    if (!isPlatformBrowser(this.platformId) || !this.db) return;
+  async addTodo(title: string, description?: string, dueDate?: Date, priority: 'low' | 'medium' | 'high' = 'medium'): Promise<string> {
+    if (!isPlatformBrowser(this.platformId) || !this.db) 
+      throw new Error('Database not available');
     
     const user = this.authService.getCurrentUser();
     if (!user) throw new Error('User not authenticated');
 
-    const todoData: Omit<Todo, 'id' | 'createdAt'> & { createdAt: any } = {
+    const todoData: Omit<Todo, 'id' | 'createdAt' | 'lastModified'> & { 
+      createdAt: any,
+      lastModified: any 
+    } = {
       title,
-      description,
+      description: description || '',
       completed: false,
       userId: user.uid,
       createdAt: serverTimestamp(),
-      priority
+      lastModified: serverTimestamp(),
+      priority,
+      tags: [],
+      category: '',
+      attachments: [],
+      subtasks: []
     };
 
     if (dueDate) {
@@ -159,7 +225,8 @@ export class TodoService implements OnDestroy {
     }
 
     try {
-      await addDoc(collection(this.db, 'todos'), todoData);
+      const docRef = await addDoc(collection(this.db, 'todos'), todoData);
+      return docRef.id;
     } catch (error) {
       console.error('Error adding todo:', error);
       throw error;
@@ -167,11 +234,18 @@ export class TodoService implements OnDestroy {
   }
 
   async updateTodo(id: string, updates: Partial<Omit<Todo, 'id' | 'userId' | 'createdAt'>>): Promise<void> {
-    if (!isPlatformBrowser(this.platformId) || !this.db) return;
+    if (!isPlatformBrowser(this.platformId) || !this.db) 
+      throw new Error('Database not available');
     
     try {
+      // Add lastModified timestamp to updates
+      const updatesWithTimestamp = {
+        ...updates,
+        lastModified: serverTimestamp()
+      };
+      
       const todoRef = doc(this.db, 'todos', id);
-      await updateDoc(todoRef, updates);
+      await updateDoc(todoRef, updatesWithTimestamp);
     } catch (error) {
       console.error('Error updating todo:', error);
       throw error;
@@ -179,7 +253,8 @@ export class TodoService implements OnDestroy {
   }
 
   async deleteTodo(id: string): Promise<void> {
-    if (!isPlatformBrowser(this.platformId) || !this.db) return;
+    if (!isPlatformBrowser(this.platformId) || !this.db) 
+      throw new Error('Database not available');
     
     try {
       await deleteDoc(doc(this.db, 'todos', id));
@@ -190,12 +265,317 @@ export class TodoService implements OnDestroy {
   }
 
   async toggleTodoComplete(id: string): Promise<void> {
-    if (!isPlatformBrowser(this.platformId) || !this.db) return;
+    if (!isPlatformBrowser(this.platformId) || !this.db) 
+      throw new Error('Database not available');
     
     const todo = this.todosSubject.value.find(t => t.id === id);
     if (!todo) throw new Error('Todo not found for toggle');
     
     await this.updateTodo(id, { completed: !todo.completed });
+  }
+  
+  // New methods for enhanced CRUD operations
+  
+  /**
+   * Get a single todo by ID
+   */
+  getTodoById(id: string): Observable<Todo> {
+    if (!isPlatformBrowser(this.platformId) || !this.db) 
+      return throwError(() => new Error('Database not available'));
+    
+    return from(getDoc(doc(this.db, 'todos', id))).pipe(
+      map(docSnap => {
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          return {
+            id: docSnap.id,
+            ...data
+          } as Todo;
+        } else {
+          throw new Error('Todo not found');
+        }
+      }),
+      catchError(error => {
+        console.error('Error getting todo by ID:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+  
+  /**
+   * Add multiple todos at once using batch write
+   */
+  async addMultipleTodos(todos: Omit<Todo, 'id' | 'createdAt' | 'userId' | 'lastModified'>[]): Promise<void> {
+    if (!isPlatformBrowser(this.platformId) || !this.db) 
+      throw new Error('Database not available');
+    
+    const user = this.authService.getCurrentUser();
+    if (!user) throw new Error('User not authenticated');
+    
+    try {
+      const batch = writeBatch(this.db);
+      const todosRef = collection(this.db, 'todos');
+      
+      todos.forEach(todo => {
+        const newTodoRef = doc(todosRef);
+        batch.set(newTodoRef, {
+          ...todo,
+          userId: user.uid,
+          completed: todo.completed || false,
+          createdAt: serverTimestamp(),
+          lastModified: serverTimestamp(),
+          priority: todo.priority || 'medium'
+        });
+      });
+      
+      await batch.commit();
+    } catch (error) {
+      console.error('Error adding multiple todos:', error);
+      throw error;
+    }
+  }
+  
+  /**
+   * Update multiple todos at once using batch write
+   */
+  async updateMultipleTodos(updates: {id: string, data: Partial<Omit<Todo, 'id' | 'userId' | 'createdAt'>>}[]): Promise<void> {
+    if (!isPlatformBrowser(this.platformId) || !this.db) 
+      throw new Error('Database not available');
+    
+    try {
+      const batch = writeBatch(this.db);
+      
+      updates.forEach(update => {
+        const todoRef = doc(this.db, 'todos', update.id);
+        batch.update(todoRef, {
+          ...update.data,
+          lastModified: serverTimestamp()
+        });
+      });
+      
+      await batch.commit();
+    } catch (error) {
+      console.error('Error updating multiple todos:', error);
+      throw error;
+    }
+  }
+  
+  /**
+   * Delete multiple todos at once using batch write
+   */
+  async deleteMultipleTodos(ids: string[]): Promise<void> {
+    if (!isPlatformBrowser(this.platformId) || !this.db) 
+      throw new Error('Database not available');
+    
+    try {
+      const batch = writeBatch(this.db);
+      
+      ids.forEach(id => {
+        const todoRef = doc(this.db, 'todos', id);
+        batch.delete(todoRef);
+      });
+      
+      await batch.commit();
+    } catch (error) {
+      console.error('Error deleting multiple todos:', error);
+      throw error;
+    }
+  }
+  
+  /**
+   * Query todos with custom filters
+   */
+  async queryTodos(
+    queries: TaskQuery[], 
+    options: TaskQueryOptions = {}
+  ): Promise<Todo[]> {
+    if (!isPlatformBrowser(this.platformId) || !this.db) 
+      throw new Error('Database not available');
+    
+    const user = this.authService.getCurrentUser();
+    if (!user) throw new Error('User not authenticated');
+    
+    try {
+      const todosRef = collection(this.db, 'todos');
+      
+      // Build query constraints
+      const queryConstraints: QueryConstraint[] = [
+        where('userId', '==', user.uid)
+      ];
+      
+      // Add custom query filters
+      queries.forEach(q => {
+        queryConstraints.push(where(q.field, q.operator, q.value));
+      });
+      
+      // Add ordering if specified
+      if (options.orderByField) {
+        queryConstraints.push(
+          orderBy(options.orderByField, options.orderDirection || 'asc')
+        );
+      }
+      
+      // Add pagination constraints
+      if (options.startAfter) {
+        queryConstraints.push(startAfter(options.startAfter));
+      }
+      
+      if (options.endBefore) {
+        queryConstraints.push(endBefore(options.endBefore));
+      }
+      
+      // Add limit if specified
+      if (options.limit) {
+        queryConstraints.push(limit(options.limit));
+      }
+      
+      const q = query(todosRef, ...queryConstraints);
+      const querySnapshot = await getDocs(q);
+      
+      return querySnapshot.docs.map(doc => this.convertFirestoreDocToTodo(doc));
+    } catch (error) {
+      console.error('Error querying todos:', error);
+      throw error;
+    }
+  }
+  
+  /**
+   * Add or update a subtask for a todo
+   */
+  async addOrUpdateSubtask(todoId: string, subtask: SubTask): Promise<void> {
+    if (!isPlatformBrowser(this.platformId) || !this.db) 
+      throw new Error('Database not available');
+    
+    try {
+      const todoRef = doc(this.db, 'todos', todoId);
+      const todoSnap = await getDoc(todoRef);
+      
+      if (!todoSnap.exists()) {
+        throw new Error('Todo not found');
+      }
+      
+      const todoData = todoSnap.data();
+      const subtasks = todoData.subtasks || [];
+      
+      // Check if subtask already exists
+      const existingIndex = subtasks.findIndex((s: SubTask) => s.id === subtask.id);
+      
+      if (existingIndex >= 0) {
+        // Update existing subtask
+        subtasks[existingIndex] = subtask;
+      } else {
+        // Add new subtask
+        subtasks.push(subtask);
+      }
+      
+      await updateDoc(todoRef, { 
+        subtasks, 
+        lastModified: serverTimestamp() 
+      });
+    } catch (error) {
+      console.error('Error adding/updating subtask:', error);
+      throw error;
+    }
+  }
+  
+  /**
+   * Remove a subtask from a todo
+   */
+  async removeSubtask(todoId: string, subtaskId: string): Promise<void> {
+    if (!isPlatformBrowser(this.platformId) || !this.db) 
+      throw new Error('Database not available');
+    
+    try {
+      const todoRef = doc(this.db, 'todos', todoId);
+      
+      await runTransaction(this.db, async (transaction) => {
+        const todoDoc = await transaction.get(todoRef);
+        
+        if (!todoDoc.exists()) {
+          throw new Error('Todo not found');
+        }
+        
+        const todoData = todoDoc.data();
+        const subtasks = todoData.subtasks || [];
+        const updatedSubtasks = subtasks.filter((s: SubTask) => s.id !== subtaskId);
+        
+        transaction.update(todoRef, { 
+          subtasks: updatedSubtasks,
+          lastModified: serverTimestamp()
+        });
+      });
+    } catch (error) {
+      console.error('Error removing subtask:', error);
+      throw error;
+    }
+  }
+  
+  /**
+   * Add tags to a todo
+   */
+  async addTags(todoId: string, tags: string[]): Promise<void> {
+    if (!isPlatformBrowser(this.platformId) || !this.db) 
+      throw new Error('Database not available');
+    
+    try {
+      const todoRef = doc(this.db, 'todos', todoId);
+      
+      await runTransaction(this.db, async (transaction) => {
+        const todoDoc = await transaction.get(todoRef);
+        
+        if (!todoDoc.exists()) {
+          throw new Error('Todo not found');
+        }
+        
+        const todoData = todoDoc.data();
+        const currentTags = todoData.tags || [];
+        
+        // Add only unique tags
+        const uniqueTags = [...new Set([...currentTags, ...tags])];
+        
+        transaction.update(todoRef, { 
+          tags: uniqueTags,
+          lastModified: serverTimestamp()
+        });
+      });
+    } catch (error) {
+      console.error('Error adding tags:', error);
+      throw error;
+    }
+  }
+  
+  /**
+   * Remove tags from a todo
+   */
+  async removeTags(todoId: string, tags: string[]): Promise<void> {
+    if (!isPlatformBrowser(this.platformId) || !this.db) 
+      throw new Error('Database not available');
+    
+    try {
+      const todoRef = doc(this.db, 'todos', todoId);
+      
+      await runTransaction(this.db, async (transaction) => {
+        const todoDoc = await transaction.get(todoRef);
+        
+        if (!todoDoc.exists()) {
+          throw new Error('Todo not found');
+        }
+        
+        const todoData = todoDoc.data();
+        const currentTags = todoData.tags || [];
+        
+        // Remove specified tags
+        const updatedTags = currentTags.filter((tag: string) => !tags.includes(tag));
+        
+        transaction.update(todoRef, { 
+          tags: updatedTags,
+          lastModified: serverTimestamp()
+        });
+      });
+    } catch (error) {
+      console.error('Error removing tags:', error);
+      throw error;
+    }
   }
 
   ngOnDestroy(): void {
