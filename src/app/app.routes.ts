@@ -32,7 +32,8 @@ export const routes: Routes = [
   {
     path: 'app/aiassistant',
     loadComponent: () => import('./components/aiassistant/ai-assistant.component').then(m => m.AiAssistantComponent),
-    canActivate: [AuthGuard]
+    canActivate: [AuthGuard],
+    data: { preload: true }
   },
   {
     path: 'profile',
