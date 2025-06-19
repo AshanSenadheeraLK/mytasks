@@ -149,7 +149,7 @@ export class TodoService implements OnDestroy {
     }
 
     try {
-      const todosRef = collection(this.db, 'todos');
+      const todosRef = collection(this.db!, 'todos');
       const q = query(
         todosRef, 
         where('userId', '==', userId),
@@ -225,7 +225,7 @@ export class TodoService implements OnDestroy {
     }
 
     try {
-      const docRef = await addDoc(collection(this.db, 'todos'), todoData);
+      const docRef = await addDoc(collection(this.db!, 'todos'), todoData);
       return docRef.id;
     } catch (error) {
       console.error('Error adding todo:', error);
@@ -244,7 +244,7 @@ export class TodoService implements OnDestroy {
         lastModified: serverTimestamp()
       };
       
-      const todoRef = doc(this.db, 'todos', id);
+      const todoRef = doc(this.db!, 'todos', id);
       await updateDoc(todoRef, updatesWithTimestamp);
     } catch (error) {
       console.error('Error updating todo:', error);
@@ -257,7 +257,7 @@ export class TodoService implements OnDestroy {
       throw new Error('Database not available');
     
     try {
-      await deleteDoc(doc(this.db, 'todos', id));
+      await deleteDoc(doc(this.db!, 'todos', id));
     } catch (error) {
       console.error('Error deleting todo:', error);
       throw error;
@@ -283,7 +283,7 @@ export class TodoService implements OnDestroy {
     if (!isPlatformBrowser(this.platformId) || !this.db) 
       return throwError(() => new Error('Database not available'));
     
-    return from(getDoc(doc(this.db, 'todos', id))).pipe(
+    return from(getDoc(doc(this.db!, 'todos', id))).pipe(
       map(docSnap => {
         if (docSnap.exists()) {
           const data = docSnap.data();
@@ -313,8 +313,8 @@ export class TodoService implements OnDestroy {
     if (!user) throw new Error('User not authenticated');
     
     try {
-      const batch = writeBatch(this.db);
-      const todosRef = collection(this.db, 'todos');
+      const batch = writeBatch(this.db!);
+      const todosRef = collection(this.db!, 'todos');
       
       todos.forEach(todo => {
         const newTodoRef = doc(todosRef);
@@ -343,10 +343,10 @@ export class TodoService implements OnDestroy {
       throw new Error('Database not available');
     
     try {
-      const batch = writeBatch(this.db);
+      const batch = writeBatch(this.db!);
       
       updates.forEach(update => {
-        const todoRef = doc(this.db, 'todos', update.id);
+        const todoRef = doc(this.db!, 'todos', update.id);
         batch.update(todoRef, {
           ...update.data,
           lastModified: serverTimestamp()
@@ -368,10 +368,10 @@ export class TodoService implements OnDestroy {
       throw new Error('Database not available');
     
     try {
-      const batch = writeBatch(this.db);
+      const batch = writeBatch(this.db!);
       
       ids.forEach(id => {
-        const todoRef = doc(this.db, 'todos', id);
+        const todoRef = doc(this.db!, 'todos', id);
         batch.delete(todoRef);
       });
       
@@ -396,7 +396,7 @@ export class TodoService implements OnDestroy {
     if (!user) throw new Error('User not authenticated');
     
     try {
-      const todosRef = collection(this.db, 'todos');
+      const todosRef = collection(this.db!, 'todos');
       
       // Build query constraints
       const queryConstraints: QueryConstraint[] = [
@@ -447,7 +447,7 @@ export class TodoService implements OnDestroy {
       throw new Error('Database not available');
     
     try {
-      const todoRef = doc(this.db, 'todos', todoId);
+      const todoRef = doc(this.db!, 'todos', todoId);
       const todoSnap = await getDoc(todoRef);
       
       if (!todoSnap.exists()) {
@@ -486,9 +486,9 @@ export class TodoService implements OnDestroy {
       throw new Error('Database not available');
     
     try {
-      const todoRef = doc(this.db, 'todos', todoId);
+      const todoRef = doc(this.db!, 'todos', todoId);
       
-      await runTransaction(this.db, async (transaction) => {
+      await runTransaction(this.db!, async (transaction) => {
         const todoDoc = await transaction.get(todoRef);
         
         if (!todoDoc.exists()) {
@@ -518,9 +518,9 @@ export class TodoService implements OnDestroy {
       throw new Error('Database not available');
     
     try {
-      const todoRef = doc(this.db, 'todos', todoId);
+      const todoRef = doc(this.db!, 'todos', todoId);
       
-      await runTransaction(this.db, async (transaction) => {
+      await runTransaction(this.db!, async (transaction) => {
         const todoDoc = await transaction.get(todoRef);
         
         if (!todoDoc.exists()) {
@@ -552,9 +552,9 @@ export class TodoService implements OnDestroy {
       throw new Error('Database not available');
     
     try {
-      const todoRef = doc(this.db, 'todos', todoId);
+      const todoRef = doc(this.db!, 'todos', todoId);
       
-      await runTransaction(this.db, async (transaction) => {
+      await runTransaction(this.db!, async (transaction) => {
         const todoDoc = await transaction.get(todoRef);
         
         if (!todoDoc.exists()) {

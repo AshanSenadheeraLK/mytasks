@@ -286,7 +286,7 @@ export class AuthService {
     
     try {
       console.log('Syncing user with Firestore:', user.uid);
-      const userRef = doc(this.db, 'users', user.uid);
+      const userRef = doc(this.db!, 'users', user.uid);
       const userDoc = await getDoc(userRef);
       
       if (!userDoc.exists()) {
@@ -377,7 +377,7 @@ export class AuthService {
     if (!this.db) return;
     
     try {
-      const userRef = doc(this.db, 'users', user.uid);
+      const userRef = doc(this.db!, 'users', user.uid);
       const userDoc = await getDoc(userRef);
       
       const userData = {
@@ -443,7 +443,7 @@ export class AuthService {
       // Try to update Firestore, but don't fail if it errors
       if (this.db) {
         try {
-          const userRef = doc(this.db, 'users', user.uid);
+          const userRef = doc(this.db!, 'users', user.uid);
           await updateDoc(userRef, { 
             displayName,
             lastUpdated: serverTimestamp()
@@ -454,7 +454,7 @@ export class AuthService {
           console.warn('Error updating Firestore profile, attempting to create document:', firestoreError);
           
           try {
-            const userRef = doc(this.db, 'users', user.uid);
+            const userRef = doc(this.db!, 'users', user.uid);
             await setDoc(userRef, {
               email: user.email || '',
               displayName,

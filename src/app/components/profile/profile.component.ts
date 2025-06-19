@@ -12,17 +12,18 @@ import { AlertService } from '../../services/alert.service';
   template: `
     <div class="bg-background min-h-screen">
       <!-- Navbar -->
-      <nav class="bg-white shadow-md">
+      <nav class="bg-white shadow-md" role="navigation" aria-label="Main navigation">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div class="flex justify-between h-16">
             <div class="flex items-center">
               <h1 class="text-xl font-display text-primary font-bold">MY TASKS</h1>
             </div>
             <div class="flex items-center space-x-4">
-              <a routerLink="/app" class="text-gray-700 hover:text-accent">Dashboard</a>
+              <a routerLink="/app" class="text-gray-700 hover:text-accent focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 rounded-md px-2 py-1" aria-label="Go to Dashboard">Dashboard</a>
               <button 
                 (click)="logout()"
-                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-accent hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent">
+                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-accent hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent"
+                aria-label="Logout from application">
                 Logout
               </button>
             </div>
@@ -31,14 +32,14 @@ import { AlertService } from '../../services/alert.service';
       </nav>
 
       <!-- Main Content -->
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div class="bg-white shadow overflow-hidden rounded-lg">
           <div class="px-4 py-5 sm:px-6">
-            <h2 class="text-2xl font-bold text-gray-900">User Profile</h2>
+            <h2 class="text-2xl font-bold text-gray-900" id="profile-heading">Your Profile</h2>
             <p class="mt-1 max-w-2xl text-sm text-gray-500">Personal details and preferences.</p>
           </div>
           <div class="border-t border-gray-200 px-4 py-5 sm:p-6">
-            <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" class="space-y-6">
+            <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" class="space-y-6" aria-labelledby="profile-heading">
               <!-- Display Name -->
               <div>
                 <label for="displayName" class="block text-sm font-medium text-gray-700">
@@ -50,8 +51,13 @@ import { AlertService } from '../../services/alert.service';
                     name="displayName" 
                     type="text" 
                     formControlName="displayName"
-                    class="form-input" 
-                    required>
+                    class="form-input w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-accent focus:border-accent" 
+                    required
+                    aria-required="true"
+                    [attr.aria-invalid]="profileForm.get('displayName')?.invalid && profileForm.get('displayName')?.touched ? true : null">
+                </div>
+                <div *ngIf="profileForm.get('displayName')?.invalid && profileForm.get('displayName')?.touched" class="text-red-500 text-sm mt-1" role="alert">
+                  Display name is required
                 </div>
               </div>
 
@@ -66,8 +72,9 @@ import { AlertService } from '../../services/alert.service';
                     name="email" 
                     type="email" 
                     formControlName="email"
-                    class="form-input bg-gray-50" 
-                    readonly>
+                    class="form-input w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50" 
+                    readonly
+                    aria-readonly="true">
                 </div>
                 <p class="mt-1 text-sm text-gray-500">Your email cannot be changed.</p>
               </div>
@@ -77,8 +84,9 @@ import { AlertService } from '../../services/alert.service';
                 <button 
                   type="submit" 
                   [disabled]="profileForm.invalid || isLoading || !profileForm.dirty"
-                  class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-accent hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent disabled:opacity-50">
-                  <svg *ngIf="isLoading" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-accent hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent disabled:opacity-50 disabled:cursor-not-allowed"
+                  aria-live="polite">
+                  <svg *ngIf="isLoading" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
@@ -88,7 +96,7 @@ import { AlertService } from '../../services/alert.service';
             </form>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   `,
   styles: []
@@ -103,7 +111,7 @@ export class ProfileComponent implements OnInit {
     private alertService: AlertService
   ) {
     this.profileForm = this.formBuilder.group({
-      displayName: ['', Validators.required],
+      displayName: ['', [Validators.required, Validators.minLength(2)]],
       email: [{ value: '', disabled: true }]
     });
   }
