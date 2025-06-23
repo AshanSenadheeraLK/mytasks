@@ -150,17 +150,29 @@ export class TodoService implements OnDestroy {
 
     try {
       const todosRef = collection(this.db!, 'todos');
+      // Modified query to only filter by userId without ordering
+      // This avoids the need for a composite index
       const q = query(
         todosRef, 
-        where('userId', '==', userId),
-        orderBy('createdAt', 'desc')
+        where('userId', '==', userId)
       );
       
       this.unsubscribe = onSnapshot(q, (querySnapshot: QuerySnapshot<DocumentData>) => {
-        const todos = querySnapshot.docs.map(doc => {
-          const data = doc.data();
-          return this.convertFirestoreDocToTodo(doc);
+        // Convert the documents to Todo objects
+        let todos = querySnapshot.docs.map(doc => this.convertFirestoreDocToTodo(doc));
+        
+        // Sort the results in memory instead of using orderBy in the query
+        todos = todos.sort((a, b) => {
+          // Handle both Date objects and Firestore Timestamps
+          const dateA = a.createdAt instanceof Date ? a.createdAt : 
+                        ('toDate' in a.createdAt ? a.createdAt.toDate() : new Date());
+          const dateB = b.createdAt instanceof Date ? b.createdAt : 
+                        ('toDate' in b.createdAt ? b.createdAt.toDate() : new Date());
+          
+          // Sort in descending order (newest first)
+          return dateB.getTime() - dateA.getTime();
         });
+        
         this.todosSubject.next(todos);
         
         // Save the last document for pagination
@@ -408,14 +420,11 @@ export class TodoService implements OnDestroy {
         queryConstraints.push(where(q.field, q.operator, q.value));
       });
       
-      // Add ordering if specified
-      if (options.orderByField) {
-        queryConstraints.push(
-          orderBy(options.orderByField, options.orderDirection || 'asc')
-        );
-      }
+      // Store ordering options for in-memory sort
+      const orderByField = options.orderByField;
+      const orderDirection = options.orderDirection || 'asc';
       
-      // Add pagination constraints
+      // Add pagination constraints without orderBy to avoid index requirements
       if (options.startAfter) {
         queryConstraints.push(startAfter(options.startAfter));
       }
@@ -432,11 +441,65 @@ export class TodoService implements OnDestroy {
       const q = query(todosRef, ...queryConstraints);
       const querySnapshot = await getDocs(q);
       
-      return querySnapshot.docs.map(doc => this.convertFirestoreDocToTodo(doc));
+      // Convert documents to Todo objects
+      let todos = querySnapshot.docs.map(doc => this.convertFirestoreDocToTodo(doc));
+      
+      // Sort in memory if an orderByField was specified
+      if (orderByField) {
+        todos = this.sortTodos(todos, orderByField, orderDirection);
+      }
+      
+      return todos;
     } catch (error) {
       console.error('Error querying todos:', error);
       throw error;
     }
+  }
+  
+  /**
+   * Sort todos in memory by a specified field
+   */
+  private sortTodos(todos: Todo[], orderByField: string, orderDirection: 'asc' | 'desc'): Todo[] {
+    return todos.sort((a, b) => {
+      // Get the values to compare
+      let valueA: any = a[orderByField as keyof Todo];
+      let valueB: any = b[orderByField as keyof Todo];
+      
+      // Handle undefined values
+      if (valueA === undefined && valueB === undefined) return 0;
+      if (valueA === undefined) return orderDirection === 'asc' ? -1 : 1;
+      if (valueB === undefined) return orderDirection === 'asc' ? 1 : -1;
+      
+      // Handle dates specially
+      if (orderByField === 'createdAt' || orderByField === 'dueDate' || orderByField === 'lastModified') {
+        // Convert to Date objects for comparison
+        const dateA = valueA instanceof Date ? valueA : 
+                     (valueA && typeof valueA === 'object' && 'toDate' in valueA ? valueA.toDate() : new Date(0));
+        const dateB = valueB instanceof Date ? valueB : 
+                     (valueB && typeof valueB === 'object' && 'toDate' in valueB ? valueB.toDate() : new Date(0));
+        
+        // Compare timestamps
+        const comparison = dateA.getTime() - dateB.getTime();
+        return orderDirection === 'asc' ? comparison : -comparison;
+      }
+      
+      // Handle string comparison
+      if (typeof valueA === 'string' && typeof valueB === 'string') {
+        const comparison = valueA.localeCompare(valueB);
+        return orderDirection === 'asc' ? comparison : -comparison;
+      }
+      
+      // Handle boolean comparison
+      if (typeof valueA === 'boolean' && typeof valueB === 'boolean') {
+        const comparison = valueA === valueB ? 0 : valueA ? 1 : -1;
+        return orderDirection === 'asc' ? comparison : -comparison;
+      }
+      
+      // Default comparison for other types
+      if (valueA < valueB) return orderDirection === 'asc' ? -1 : 1;
+      if (valueA > valueB) return orderDirection === 'asc' ? 1 : -1;
+      return 0;
+    });
   }
   
   /**
@@ -455,7 +518,7 @@ export class TodoService implements OnDestroy {
       }
       
       const todoData = todoSnap.data();
-      const subtasks = todoData.subtasks || [];
+      const subtasks = todoData['subtasks'] || [];
       
       // Check if subtask already exists
       const existingIndex = subtasks.findIndex((s: SubTask) => s.id === subtask.id);
@@ -496,7 +559,7 @@ export class TodoService implements OnDestroy {
         }
         
         const todoData = todoDoc.data();
-        const subtasks = todoData.subtasks || [];
+        const subtasks = todoData['subtasks'] || [];
         const updatedSubtasks = subtasks.filter((s: SubTask) => s.id !== subtaskId);
         
         transaction.update(todoRef, { 
@@ -528,7 +591,7 @@ export class TodoService implements OnDestroy {
         }
         
         const todoData = todoDoc.data();
-        const currentTags = todoData.tags || [];
+        const currentTags = todoData['tags'] || [];
         
         // Add only unique tags
         const uniqueTags = [...new Set([...currentTags, ...tags])];
@@ -562,7 +625,7 @@ export class TodoService implements OnDestroy {
         }
         
         const todoData = todoDoc.data();
-        const currentTags = todoData.tags || [];
+        const currentTags = todoData['tags'] || [];
         
         // Remove specified tags
         const updatedTags = currentTags.filter((tag: string) => !tags.includes(tag));

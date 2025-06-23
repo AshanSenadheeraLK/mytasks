@@ -2,12 +2,12 @@
   <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-4">
     <div class="flex items-center justify-between mb-6">
       <h1 class="text-2xl font-semibold text-gray-800 dark:text-white">My Tasks</h1>
-      <div class="flex items-center space-x-2">
-        <button class="btn btn-primary flex items-center">
-          <i class="bi bi-plus-circle mr-2"></i>
+      <div class="flex items-center space-x-3">
+        <button class="btn btn-primary flex items-center group">
+          <i class="bi bi-plus-circle mr-2 group-hover:scale-110 transition-transform"></i>
           Add Task
         </button>
-        <button class="btn btn-secondary">
+        <button class="btn btn-secondary flex items-center" aria-label="Filter tasks">
           <i class="bi bi-funnel"></i>
         </button>
       </div>
@@ -38,48 +38,126 @@
     <!-- Task List -->
     <div class="space-y-3 max-h-[calc(100vh-220px)] overflow-y-auto pr-1 custom-scrollbar">
       <!-- Task Item Template -->
-      <div class="task-item flex items-start justify-between group">
+      <div class="task-item flex items-start justify-between group hover:scale-[1.01] transition-transform">
         <div class="flex items-start space-x-3 flex-grow">
-          <input type="checkbox" class="checkbox-custom mt-1" />
+          <div class="pt-1">
+            <input type="checkbox" class="checkbox-custom" />
+          </div>
           <div>
-            <h3 class="task-title text-gray-800 dark:text-white">Complete UI/UX Improvements</h3>
+            <h3 class="task-title text-gray-800 dark:text-white font-medium">Complete UI/UX Improvements</h3>
             <p class="text-sm text-gray-600 dark:text-gray-300 mb-2">Enhance the user interface and fix design issues</p>
-            <div class="flex items-center space-x-3 text-xs">
+            <div class="flex flex-wrap items-center gap-3 text-xs">
               <span class="status-badge status-badge-pending">In Progress</span>
-              <span class="text-gray-500 dark:text-gray-400"><i class="bi bi-calendar3 mr-1"></i> Today</span>
-              <span class="text-red-500 dark:text-red-400"><i class="bi bi-flag-fill mr-1"></i> High</span>
+              <span class="text-gray-500 dark:text-gray-400 flex items-center">
+                <i class="bi bi-calendar3 mr-1.5"></i> Today
+              </span>
+              <span class="text-danger dark:text-red-400 flex items-center">
+                <i class="bi bi-flag-fill mr-1.5"></i> High
+              </span>
             </div>
           </div>
         </div>
-        <div class="hidden group-hover:flex items-center space-x-1">
-          <button class="p-1 text-gray-500 hover:text-blue-500 dark:text-gray-400 dark:hover:text-blue-400">
+        <div class="hidden group-hover:flex items-center space-x-2 animate-fade-in">
+          <button class="p-2 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-500 hover:text-primary dark:text-gray-400 dark:hover:text-primary transition-colors" aria-label="Edit task">
             <i class="bi bi-pencil-square"></i>
           </button>
-          <button class="p-1 text-gray-500 hover:text-red-500 dark:text-gray-400 dark:hover:text-red-400">
+          <button class="p-2 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-500 hover:text-danger dark:text-gray-400 dark:hover:text-danger transition-colors" aria-label="Delete task">
             <i class="bi bi-trash"></i>
           </button>
         </div>
       </div>
-
-      <!-- Additional task items would be rendered here -->
+      
+      <!-- Completed Task Example -->
+      <div class="task-item task-item-completed flex items-start justify-between group hover:scale-[1.01] transition-transform">
+        <div class="flex items-start space-x-3 flex-grow">
+          <div class="pt-1">
+            <input type="checkbox" class="checkbox-custom" checked />
+          </div>
+          <div>
+            <h3 class="task-title text-gray-500 dark:text-gray-400 font-medium line-through">Fix Navigation Bar</h3>
+            <p class="text-sm text-gray-400 dark:text-gray-500 mb-2 line-through">Fix responsive issues with the navigation bar</p>
+            <div class="flex flex-wrap items-center gap-3 text-xs">
+              <span class="status-badge status-badge-completed">Completed</span>
+              <span class="text-gray-400 dark:text-gray-500 flex items-center line-through">
+                <i class="bi bi-calendar3 mr-1.5"></i> Yesterday
+              </span>
+              <span class="text-yellow-500 dark:text-yellow-600 flex items-center line-through">
+                <i class="bi bi-flag-fill mr-1.5"></i> Medium
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="hidden group-hover:flex items-center space-x-2 animate-fade-in">
+          <button class="p-2 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-500 hover:text-primary dark:text-gray-400 dark:hover:text-primary transition-colors" aria-label="Edit task">
+            <i class="bi bi-pencil-square"></i>
+          </button>
+          <button class="p-2 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-500 hover:text-danger dark:text-gray-400 dark:hover:text-danger transition-colors" aria-label="Delete task">
+            <i class="bi bi-trash"></i>
+          </button>
+        </div>
+      </div>
+      
+      <!-- Another Task Example -->
+      <div class="task-item flex items-start justify-between group hover:scale-[1.01] transition-transform">
+        <div class="flex items-start space-x-3 flex-grow">
+          <div class="pt-1">
+            <input type="checkbox" class="checkbox-custom" />
+          </div>
+          <div>
+            <h3 class="task-title text-gray-800 dark:text-white font-medium">Implement Dark Mode</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-300 mb-2">Add proper dark mode support with smooth transitions</p>
+            <div class="flex flex-wrap items-center gap-3 text-xs">
+              <span class="status-badge status-badge-pending">In Progress</span>
+              <span class="text-gray-500 dark:text-gray-400 flex items-center">
+                <i class="bi bi-calendar3 mr-1.5"></i> Tomorrow
+              </span>
+              <span class="text-success dark:text-green-400 flex items-center">
+                <i class="bi bi-flag-fill mr-1.5"></i> Low
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="hidden group-hover:flex items-center space-x-2 animate-fade-in">
+          <button class="p-2 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-500 hover:text-primary dark:text-gray-400 dark:hover:text-primary transition-colors" aria-label="Edit task">
+            <i class="bi bi-pencil-square"></i>
+          </button>
+          <button class="p-2 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-500 hover:text-danger dark:text-gray-400 dark:hover:text-danger transition-colors" aria-label="Delete task">
+            <i class="bi bi-trash"></i>
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 
   <!-- Empty State -->
-  <div class="hidden text-center py-20">
-    <div class="text-6xl text-gray-300 dark:text-gray-600 mb-4">
+  <div class="hidden text-center empty-state">
+    <div class="empty-state-icon">
       <i class="bi bi-check2-all"></i>
     </div>
-    <h3 class="text-xl font-medium text-gray-700 dark:text-gray-300 mb-2">No tasks yet</h3>
-    <p class="text-gray-500 dark:text-gray-400 mb-6">Create your first task to get started</p>
+    <h3 class="empty-state-title">No tasks yet</h3>
+    <p class="empty-state-description">Create your first task to get started</p>
     <button class="btn btn-primary">
       <i class="bi bi-plus-circle mr-2"></i>
       Add Your First Task
     </button>
   </div>
 
+  <!-- Bulk Action Bar (appears when items are selected) -->
+  <div class="bulk-action-bar hidden">
+    <div class="text-sm font-medium mr-2">2 selected</div>
+    <button class="btn btn-accent btn-sm">
+      <i class="bi bi-check-circle mr-1"></i> Complete
+    </button>
+    <button class="btn btn-danger btn-sm">
+      <i class="bi bi-trash mr-1"></i> Delete
+    </button>
+    <button class="btn btn-secondary btn-sm">
+      <i class="bi bi-x-circle mr-1"></i> Cancel
+    </button>
+  </div>
+
   <!-- Floating Action Button for Mobile -->
-  <button class="fab lg:hidden">
+  <button class="fab lg:hidden button-press">
     <i class="bi bi-plus text-xl"></i>
   </button>
 </div>

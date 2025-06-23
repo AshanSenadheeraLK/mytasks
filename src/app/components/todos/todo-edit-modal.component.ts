@@ -16,13 +16,13 @@ import { Todo } from '../../services/todo.service';
       aria-labelledby="modalTitle"
       aria-modal="true">
       <div 
-        class="bg-white dark:bg-gray-800 max-w-md w-full mx-auto transform transition-all duration-300 animate-slide-up shadow-2xl rounded-3xl overflow-hidden mobile-device:max-h-[95vh] mobile-device:overflow-y-auto"
+        class="bg-white dark:bg-gray-800 max-w-md w-full mx-auto transform transition-all duration-300 animate-slide-up shadow-2xl rounded-2xl overflow-hidden mobile-device:max-h-[95vh] mobile-device:overflow-y-auto"
         [class.scale-100]="true" 
         [class.opacity-100]="true"
         (click)="$event.stopPropagation()">
         
         <!-- Decorative top bar with accent color -->
-        <div class="h-2 bg-gradient-to-r from-blue-500 to-purple-500"></div>
+        <div class="h-2 bg-gradient-to-r from-primary to-primary-dark"></div>
         
         <!-- Header with clean design -->
         <div class="px-8 pt-7 pb-4">
@@ -33,17 +33,17 @@ import { Todo } from '../../services/todo.service';
         </div>
         
         <!-- Form body with soft background -->
-        <div class="px-8 py-6 bg-gray-50 dark:bg-gray-700 rounded-t-3xl mobile-device:pb-16">
+        <div class="px-8 py-6 bg-gray-50 dark:bg-gray-700 rounded-t-3xl mobile-device:pb-20">
           <form #todoForm="ngForm" (ngSubmit)="onSave()" class="space-y-5">
             <!-- Title Field -->
             <div class="space-y-2">
-              <label for="title" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Task Title <span class="text-red-500">*</span>
+              <label for="title" class="block text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center">
+                Task Title <span class="text-danger ml-1">*</span>
               </label>
               <div class="relative rounded-xl shadow-sm">
                 <input 
                   type="text" 
-                  class="block w-full pl-4 pr-10 py-3 border-0 ring-1 ring-gray-300 dark:ring-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                  class="block w-full pl-4 pr-10 py-3 border-0 ring-1 ring-gray-300 dark:ring-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-primary transition-all"
                   id="title"
                   name="title"
                   [(ngModel)]="editedTodo.title"
@@ -59,7 +59,7 @@ import { Todo } from '../../services/todo.service';
               </div>
               <div 
                 *ngIf="titleInput.invalid && (titleInput.dirty || titleInput.touched)" 
-                class="text-red-500 text-sm animate-fade-in flex items-center mt-1">
+                class="text-danger text-sm animate-fade-in flex items-center mt-1">
                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
@@ -74,7 +74,7 @@ import { Todo } from '../../services/todo.service';
               </label>
               <div class="relative rounded-xl shadow-sm">
                 <textarea 
-                  class="block w-full pl-4 pr-10 py-3 border-0 ring-1 ring-gray-300 dark:ring-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all resize-none"
+                  class="block w-full pl-4 pr-10 py-3 border-0 ring-1 ring-gray-300 dark:ring-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-primary transition-all resize-none"
                   id="description"
                   name="description"
                   [(ngModel)]="editedTodo.description"
@@ -99,18 +99,18 @@ import { Todo } from '../../services/todo.service';
                   type="button"
                   [ngClass]="{
                     'relative flex flex-col items-center justify-center px-4 py-3 border rounded-xl cursor-pointer focus:outline-none transition-all duration-200': true,
-                    'border-green-200 bg-green-50 dark:bg-green-900/20 shadow-md': editedTodo.priority === 'low',
-                    'border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800': !editedTodo.priority || editedTodo.priority !== 'low'
+                    'border-success/30 bg-success/10 dark:bg-success/5 shadow-md': editedTodo.priority === 'low',
+                    'border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700': !editedTodo.priority || editedTodo.priority !== 'low'
                   }"
                   (click)="setPriority('low')">
-                  <div class="flex items-center justify-center w-8 h-8 rounded-full bg-green-100 dark:bg-green-900/30 mb-1">
-                    <svg class="w-5 h-5 text-green-600 dark:text-green-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <div class="flex items-center justify-center w-8 h-8 rounded-full bg-success/20 dark:bg-success/10 mb-1">
+                    <svg class="w-5 h-5 text-success" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                     </svg>
                   </div>
                   <div class="text-sm font-medium" 
                     [ngClass]="{
-                      'text-green-700 dark:text-green-400': editedTodo.priority === 'low',
+                      'text-success': editedTodo.priority === 'low',
                       'text-gray-700 dark:text-gray-300': !editedTodo.priority || editedTodo.priority !== 'low'
                     }">Low</div>
                 </button>
@@ -120,18 +120,18 @@ import { Todo } from '../../services/todo.service';
                   type="button"
                   [ngClass]="{
                     'relative flex flex-col items-center justify-center px-4 py-3 border rounded-xl cursor-pointer focus:outline-none transition-all duration-200': true,
-                    'border-yellow-200 bg-yellow-50 dark:bg-yellow-900/20 shadow-md': editedTodo.priority === 'medium',
-                    'border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800': !editedTodo.priority || editedTodo.priority !== 'medium'
+                    'border-warning/30 bg-warning/10 dark:bg-warning/5 shadow-md': editedTodo.priority === 'medium',
+                    'border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700': !editedTodo.priority || editedTodo.priority !== 'medium'
                   }"
                   (click)="setPriority('medium')">
-                  <div class="flex items-center justify-center w-8 h-8 rounded-full bg-yellow-100 dark:bg-yellow-900/30 mb-1">
-                    <svg class="w-5 h-5 text-yellow-600 dark:text-yellow-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <div class="flex items-center justify-center w-8 h-8 rounded-full bg-warning/20 dark:bg-warning/10 mb-1">
+                    <svg class="w-5 h-5 text-warning" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01" />
                     </svg>
                   </div>
                   <div class="text-sm font-medium"
                     [ngClass]="{
-                      'text-yellow-700 dark:text-yellow-400': editedTodo.priority === 'medium',
+                      'text-warning': editedTodo.priority === 'medium',
                       'text-gray-700 dark:text-gray-300': !editedTodo.priority || editedTodo.priority !== 'medium'
                     }">Medium</div>
                 </button>
@@ -141,18 +141,18 @@ import { Todo } from '../../services/todo.service';
                   type="button"
                   [ngClass]="{
                     'relative flex flex-col items-center justify-center px-4 py-3 border rounded-xl cursor-pointer focus:outline-none transition-all duration-200': true,
-                    'border-red-200 bg-red-50 dark:bg-red-900/20 shadow-md': editedTodo.priority === 'high',
-                    'border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800': !editedTodo.priority || editedTodo.priority !== 'high'
+                    'border-danger/30 bg-danger/10 dark:bg-danger/5 shadow-md': editedTodo.priority === 'high',
+                    'border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700': !editedTodo.priority || editedTodo.priority !== 'high'
                   }"
                   (click)="setPriority('high')">
-                  <div class="flex items-center justify-center w-8 h-8 rounded-full bg-red-100 dark:bg-red-900/30 mb-1">
-                    <svg class="w-5 h-5 text-red-600 dark:text-red-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <div class="flex items-center justify-center w-8 h-8 rounded-full bg-danger/20 dark:bg-danger/10 mb-1">
+                    <svg class="w-5 h-5 text-danger" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
                     </svg>
                   </div>
                   <div class="text-sm font-medium"
                     [ngClass]="{
-                      'text-red-700 dark:text-red-400': editedTodo.priority === 'high',
+                      'text-danger': editedTodo.priority === 'high',
                       'text-gray-700 dark:text-gray-300': !editedTodo.priority || editedTodo.priority !== 'high'
                     }">High</div>
                 </button>
@@ -174,7 +174,7 @@ import { Todo } from '../../services/todo.service';
                   </div>
                   <input 
                     type="date" 
-                    class="block w-full pl-10 pr-3 py-3 border-0 ring-1 ring-gray-300 dark:ring-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                    class="block w-full pl-10 pr-3 py-3 border-0 ring-1 ring-gray-300 dark:ring-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-primary transition-all"
                     id="dueDate"
                     name="dueDate"
                     [ngModel]="getDueDate() | date:'yyyy-MM-dd'"
@@ -190,7 +190,7 @@ import { Todo } from '../../services/todo.service';
                   </div>
                   <input 
                     type="time" 
-                    class="block w-full pl-10 pr-3 py-3 border-0 ring-1 ring-gray-300 dark:ring-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                    class="block w-full pl-10 pr-3 py-3 border-0 ring-1 ring-gray-300 dark:ring-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-primary transition-all"
                     id="dueTime"
                     name="dueTime"
                     [ngModel]="getDueTime()"
@@ -200,14 +200,14 @@ import { Todo } from '../../services/todo.service';
             </div>
 
             <!-- Completed Checkbox (for edit mode) -->
-            <div *ngIf="!isNewTodo" class="flex items-center bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700">
+            <div *ngIf="!isNewTodo" class="flex items-center bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
               <input 
                 type="checkbox" 
                 id="completed" 
                 name="completed"
                 [(ngModel)]="editedTodo.completed"
-                class="h-5 w-5 text-blue-600 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500">
-              <label for="completed" class="ml-3 block text-gray-700 dark:text-gray-300">
+                class="h-5 w-5 text-primary border-gray-300 dark:border-gray-600 rounded focus:ring-primary">
+              <label for="completed" class="ml-3 block text-gray-700 dark:text-gray-300 select-none cursor-pointer">
                 Mark as completed
               </label>
             </div>
@@ -216,13 +216,13 @@ import { Todo } from '../../services/todo.service';
             <div class="pt-5 flex gap-3 mobile-device:fixed mobile-device:bottom-0 mobile-device:left-0 mobile-device:right-0 mobile-device:bg-gray-50 mobile-device:dark:bg-gray-700 mobile-device:p-4 mobile-device:shadow-lg mobile-device:border-t mobile-device:border-gray-200 mobile-device:dark:border-gray-600 mobile-device:z-10">
               <button 
                 type="button" 
-                class="flex-1 flex justify-center items-center px-6 py-3 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm text-base font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all duration-200"
+                class="flex-1 flex justify-center items-center px-6 py-3 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm text-base font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all duration-200 hover:shadow"
                 (click)="onClose()">
                 Cancel
               </button>
               <button 
                 type="submit" 
-                class="flex-1 flex justify-center items-center px-6 py-3 border border-transparent rounded-xl shadow-sm text-base font-medium text-white bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200"
+                class="flex-1 flex justify-center items-center px-6 py-3 border border-transparent rounded-xl shadow-sm text-base font-medium text-white bg-primary hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all duration-200 hover:shadow"
                 [disabled]="!todoForm.form.valid"
                 [class.opacity-50]="!todoForm.form.valid"
                 [class.cursor-not-allowed]="!todoForm.form.valid">

@@ -13,6 +13,8 @@ import { SearchBarComponent, SearchFilter } from '../shared/search-bar.component
 import { ThemeToggleComponent } from '../shared/theme-toggle.component';
 import { ResponsiveLayoutComponent } from '../shared/responsive-layout.component';
 import { DeviceService } from '../../services/device.service';
+import { MobileTodoListComponent } from './mobile-todo-list.component';
+import { TabletTodoListComponent } from './tablet-todo-list.component';
 // Import compiler to ensure JIT compilation works
 import '@angular/compiler';
 
@@ -29,7 +31,9 @@ const version = '1.3.0';
     ToastNotificationsComponent,
     SearchBarComponent,
     ThemeToggleComponent,
-    ResponsiveLayoutComponent
+    ResponsiveLayoutComponent,
+    MobileTodoListComponent,
+    TabletTodoListComponent
   ],
   template: `
     <app-responsive-layout
@@ -40,97 +44,29 @@ const version = '1.3.0';
 
     <!-- Mobile Template -->
     <ng-template #mobileTemplate>
-      <div class="p-4">
-        <h1 class="text-xl font-bold">My Tasks</h1>
-        <div class="mt-2">
-          <app-search-bar (search)="onSearch($event)" placeholder="Search tasks..." class="w-full"></app-search-bar>
-        </div>
-        <div class="mt-4 space-y-4">
-          <div *ngFor="let todo of filteredTodos" class="task-item mb-4">
-            <div class="flex justify-between items-start">
-              <label class="flex items-center space-x-2">
-                <input type="checkbox" [checked]="todo.completed" (change)="toggleTodo(todo.id!)" class="checkbox-custom">
-                <span [class.task-completed]="todo.completed" class="font-medium">{{ todo.title }}</span>
-              </label>
-              <div class="flex space-x-2">
-                <button (click)="openEditModal(todo)" class="p-1.5 rounded-full bg-gray-100 dark:bg-gray-700" aria-label="Edit task">
-                  <i class="bi bi-pencil text-xs text-gray-500 dark:text-gray-400"></i>
-                </button>
-                <button (click)="deleteTodo(todo.id!)" class="p-1.5 rounded-full bg-gray-100 dark:bg-gray-700" aria-label="Delete task">
-                  <i class="bi bi-trash text-xs text-gray-500 dark:text-gray-400"></i>
-                </button>
-              </div>
-            </div>
-            <p *ngIf="todo.description" class="text-sm text-gray-600 dark:text-gray-400 mb-2 line-clamp-2">
-              {{ todo.description }}
-            </p>
-            <div class="flex justify-between items-center text-xs text-gray-500 dark:text-gray-400">
-              <span *ngIf="todo.dueDate">Due: {{ formatDate(todo.dueDate) }}</span>
-              <span *ngIf="todo.priority" [ngClass]="{
-                'text-red-500 dark:text-red-400': todo.priority === 'high',
-                'text-yellow-500 dark:text-yellow-400': todo.priority === 'medium',
-                'text-green-500 dark:text-green-400': todo.priority === 'low'
-              }">
-                {{ todo.priority | titlecase }}
-              </span>
-            </div>
-          </div>
-        </div>
-        <button (click)="openAddModal()" class="fab">+</button>
-        <app-todo-edit-modal *ngIf="showModal" [todo]="selectedTodo" (save)="onModalSave($event)" (close)="closeModal()"></app-todo-edit-modal>
-        <app-toast-notifications></app-toast-notifications>
-        <app-theme-toggle></app-theme-toggle>
-      </div>
+      <app-mobile-todo-list
+        [todos]="todos"
+        [filteredTodos]="filteredTodos"
+        (toggleComplete)="toggleTodo($event)"
+        (edit)="onMobileEdit($event)"
+        (delete)="deleteTodo($event)"
+        (add)="onMobileAdd($event)"
+        (search)="onSearch($event)">
+      </app-mobile-todo-list>
     </ng-template>
 
     <!-- Tablet Template -->
     <ng-template #tabletTemplate>
-      <div class="p-6 grid grid-cols-2 gap-4">
-        <div>
-          <h2 class="text-lg font-semibold">Stats</h2>
-          <div>Total: {{ todos.length }}</div>
-          <div>Pending: {{ getActiveCount(todos) }}</div>
-          <div>Completed: {{ getCompletedCount(todos) }}</div>
-        </div>
-        <div>
-          <app-search-bar (search)="onSearch($event)" placeholder="Search tasks..." class="w-full"></app-search-bar>
-          <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div *ngFor="let todo of filteredTodos" class="task-item">
-              <div class="flex justify-between items-start mb-2">
-                <label class="flex items-center space-x-2">
-                  <input type="checkbox" [checked]="todo.completed" (change)="toggleTodo(todo.id!)" class="checkbox-custom">
-                  <span [class.task-completed]="todo.completed" class="font-medium">{{ todo.title }}</span>
-                </label>
-                <div class="flex space-x-2">
-                  <button (click)="openEditModal(todo)" class="p-1.5 rounded-full bg-gray-100 dark:bg-gray-700" aria-label="Edit task">
-                    <i class="bi bi-pencil text-xs text-gray-500 dark:text-gray-400"></i>
-                  </button>
-                  <button (click)="deleteTodo(todo.id!)" class="p-1.5 rounded-full bg-gray-100 dark:bg-gray-700" aria-label="Delete task">
-                    <i class="bi bi-trash text-xs text-gray-500 dark:text-gray-400"></i>
-                  </button>
-                </div>
-              </div>
-              <p *ngIf="todo.description" class="text-sm text-gray-600 dark:text-gray-400 mb-2 line-clamp-2">
-                {{ todo.description }}
-              </p>
-              <div class="flex justify-between items-center text-xs text-gray-500 dark:text-gray-400">
-                <span *ngIf="todo.dueDate">Due: {{ formatDate(todo.dueDate) }}</span>
-                <span *ngIf="todo.priority" [ngClass]="{
-                  'text-red-500 dark:text-red-400': todo.priority === 'high',
-                  'text-yellow-500 dark:text-yellow-400': todo.priority === 'medium',
-                  'text-green-500 dark:text-green-400': todo.priority === 'low'
-                }">
-                  {{ todo.priority | titlecase }}
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-        <button (click)="openAddModal()" class="fab">+</button>
-        <app-todo-edit-modal *ngIf="showModal" [todo]="selectedTodo" (save)="onModalSave($event)" (close)="closeModal()"></app-todo-edit-modal>
-        <app-toast-notifications></app-toast-notifications>
-        <app-theme-toggle class="fixed top-4 right-4"></app-theme-toggle>
-      </div>
+      <app-tablet-todo-list
+        [todos]="todos"
+        [filteredTodos]="filteredTodos"
+        (toggleComplete)="toggleTodo($event)"
+        (edit)="onMobileEdit($event)"
+        (delete)="deleteTodo($event)"
+        (add)="onMobileAdd($event)"
+        (search)="onSearch($event)"
+        (filter)="onSearch($event)">
+      </app-tablet-todo-list>
     </ng-template>
 
     <!-- Desktop Template (Original) -->
@@ -875,5 +811,26 @@ export class TodoListComponent implements OnInit, OnDestroy {
     showMyNotes(): void {
       if (!this.isBrowser) return;
       this.filteredTodos = this.todos.filter(todo => !!todo.description && todo.description.trim() !== '');
+    }
+
+    // Methods for mobile and tablet components
+    onMobileEdit(todo: Todo): void {
+      if (todo && todo.id) {
+        this.openEditModal(todo);
+      }
+    }
+
+    onMobileAdd(todoData: Partial<Todo>): void {
+      this.todoService.addTodo(
+        todoData.title || 'New Task', 
+        todoData.description,
+        todoData.dueDate as Date,
+        todoData.priority as 'low' | 'medium' | 'high'
+      ).then(() => {
+        this.alertService.addAlert('Task created successfully!', 'success', true, true);
+      }).catch(error => {
+        console.error('Error saving todo:', error);
+        this.alertService.addAlert('Could not save task. Please try again.', 'error', true, true);
+      });
     }
 } 
